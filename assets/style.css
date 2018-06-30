@@ -11,3 +11,9 @@ feature-addHeader
 .hide {
     display: none;
 }
+.titleRow {
+    background-color: firebrick;
+}
+.user-input{
+    background-color: #5e5e5e;
+}
