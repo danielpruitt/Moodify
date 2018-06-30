@@ -28,20 +28,25 @@
 
         <div class="app">
       
-          <a href="#" id="start-camera" class="visible">Touch here to start the app.</a>
+        <!-- This is a click link for mobile browsers to start the video. Video camera on computer browsers start automatically. -->
+        <a href="#" id="start-camera" class="visible">Touch here to start the app.</a>
+
           <video muted id="camera-stream"></video>
           <img id="snap">
       
           <p id="error-message"></p>
       
+          <!-- Links with click functions -->
           <div class="controls">
             <a href="#" id="delete-photo" title="Delete Photo" class="disabled"><i class="material-icons">delete</i></a>
-            <a href="#" id="take-photo" title="Take Photo"><i class="material-icons">camera_alt</i></a>
-            <a href="#" id="download-photo" download="selfie.png" title="Save Photo" class="disabled"><i class="material-icons">file_download</i></a>  
+            <a href="#" id="take-photo" title="Take Photo"><i class="material-icons">Take_Screenshot</i></a>
+            <a href="#" id="download-photo" download="selfie.png" title="Save Photo" class="disabled"><i class="material-icons">Download_snapshot</i></a>  
           </div>
       
           <!-- Hidden canvas element. Used for taking snapshot of video. -->
-          <canvas></canvas>
+          <!-- The hide class is used to prevent displaying the image within the canvas tag.
+            The image already shows up in the img tag with the id "snap", so I wanted to hide this to prevent duplicates-->
+            <canvas class="hide"></canvas>
       
         </div>
       
