@@ -1,4 +1,13 @@
 /* styles go here */
+feature-addHeader
+#header {
+    background-color: black;
+    color: white;
+    font-family: Galada, cursive;
+    font-size: 500%;
+    text-align: center;
+}
+
 .hide {
     display: none;
 }
