@@ -85,8 +85,8 @@ document.addEventListener('DOMContentLoaded', function () {
         // Set the href attribute of the download button to the snap url.
         download_photo_btn.href = snap;
 
-        // Pause video playback of stream.
-        video.pause();
+        // Pause video playback of stream. Comment it to keep video playing even after taking snapshot
+        // video.pause();
 
     });
 
@@ -102,6 +102,7 @@ document.addEventListener('DOMContentLoaded', function () {
         // Disable delete and save buttons
         delete_photo_btn.classList.add("disabled");
         download_photo_btn.classList.add("disabled");
+
 
         // Resume playback of stream.
         video.play();
