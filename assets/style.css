@@ -1,13 +1,37 @@
 /* styles go here */
-feature-addHeader
-#header {
+body {
+    background-color:#5e5e5e;
+}
+.header {
     background-color: black;
     color: white;
     font-family: Galada, cursive;
     font-size: 500%;
     text-align: center;
+    text-shadow: 2px 1px rgb(28, 230, 9)
 }
 
 .hide {
     display: none;
+}
+
+
+.sidebar{
+    background-color: #5e5e5e;
+    height: 80%;
+    border-right:1px solid black
+}
+#camera-stream{
+    width: 170px;
+    height: 150px;
+}
+
+.visible{
+    width:170px;
+}
+
+.musicbar{
+    font-family: Galada,cursive;
+    background:#5e5e5e;;
+    
 }
