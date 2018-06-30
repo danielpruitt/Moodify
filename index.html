@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="assets/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-rc.2/css/materialize.min.css">
     <link rel="manifest" href="manifest.json">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-rc.2/js/materialize.min.js"></script>         
@@ -12,49 +13,55 @@
     <title>Moodify</title>
 </head>
 <body>
-    <h1>Project 1</h1>
-    <div class="container">
+    <div class="row titleRow">
+        <h1 class="">Moodify</h1>
+    </div>
 
-        <div class="app">
-      
-        <!-- This is a click link for mobile browsers to start the video. Video camera on computer browsers start automatically. -->
-        <a href="#" id="start-camera" class="visible">Touch here to start the app.</a>
+    <div class="row ">
 
-          <video muted id="camera-stream"></video>
-          <img id="snap">
-      
-          <p id="error-message"></p>
-      
-          <!-- Links with click functions -->
-          <div class="controls">
-            <a href="#" id="delete-photo" title="Delete Photo" class="disabled"><i class="material-icons">delete</i></a>
-            <a href="#" id="take-photo" title="Take Photo"><i class="material-icons">Take_Screenshot</i></a>
-            <a href="#" id="download-photo" download="selfie.png" title="Save Photo" class="disabled"><i class="material-icons">Download_snapshot</i></a>  
-          </div>
-      
-          <!-- Hidden canvas element. Used for taking snapshot of video. -->
-          <!-- The hide class is used to prevent displaying the image within the canvas tag.
-            The image already shows up in the img tag with the id "snap", so I wanted to hide this to prevent duplicates-->
-            <canvas class="hide"></canvas>
-      
-        </div>
-      
-      </div>
-      
-      
-      <script>
-      // Register Service Worker.
-      if ('serviceWorker' in navigator) {
-          // Path is relative to the origin, not project root.
-          navigator.serviceWorker.register('/pwa-photobooth/sw.js')
-          .then(function(reg) {
-              console.log('Registration succeeded. Scope is ' + reg.scope);
-          })
-          .catch(function(error) {
-              console.error('Registration failed with ' + error);
-          });
-      }
-      </script>
-    <script src="assets/app.js"></script>
+        <div class="col s12 m4 l3 user-input">
+            <div class="app ">
+            <!-- This is a click link for mobile browsers to start the video. Video camera on computer browsers start automatically. -->
+            <a href="#" id="start-camera" class="visible">Touch here to start the app.</a>
+
+            <video muted id="camera-stream"></video>
+            <img id="snap">
+        
+            <p id="error-message"></p>
+        
+            <!-- Links with click functions -->
+            <div class="controls">
+                <a href="#" id="take-photo" title="Take Photo " class="waves-effect waves-light btn-small"><i class="material-icons">Take Screenshot</i></a>
+                <a href="#" id="download-photo" download="selfie.png" title="Save Photo" class="disabled waves-effect waves-light btn-small"><i class="material-icons">Download Snapshot</i></a>
+                <a href="#" id="delete-photo" title="Delete Photo" class="disabled waves-effect waves-light btn-small"><i class="material-icons">Delete</i></a>  
+            </div>
+        
+            <!-- Hidden canvas element. Used for taking snapshot of video. -->
+            <!-- The hide class is used to prevent displaying the image within the canvas tag.
+                The image already shows up in the img tag with the id "snap", so I wanted to hide this to prevent duplicates-->
+                <canvas class="hide"></canvas>
+            </div>
+         </div>
+
+         <div class="col s12 m8 l9">
+
+
+         </div>
+    </div>
+
+<script>
+    // Register Service Worker.
+    if ('serviceWorker' in navigator) {
+        // Path is relative to the origin, not project root.
+        navigator.serviceWorker.register('/pwa-photobooth/sw.js')
+        .then(function(reg) {
+            console.log('Registration succeeded. Scope is ' + reg.scope);
+        })
+        .catch(function(error) {
+            console.error('Registration failed with ' + error);
+        });
+    }
+</script>
+<script src="assets/app.js"></script>
 </body>
 </html>
