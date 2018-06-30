@@ -1,6 +1,8 @@
 /* styles go here */
 #header {
-    
+    background-color: black;
+    color: white;
     font-family: Galada, cursive;
     font-size: 500%;
+    text-align: center;
 }
