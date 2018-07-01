@@ -74,6 +74,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
         var snap = takeSnapshot();
 
+        //var base64Snap = snap.replace("data:image/png;base64,", "");
+        var base64Snap = "https://image.shutterstock.com/image-photo/studio-shot-young-man-looking-260nw-372072697.jpg";
+        console.log(base64Snap);
+        var queryURL = "https://api-us.faceplusplus.com/facepp/v3/detect?api_key=NsFmyIYabjLQuaku8CsJAfNJ2cnHQGvb&api_secret=fq_pOSQXMz2UUZULckJHvx-Sg_0qgs_u&image_base64="+base64Snap;
+
+
         // Show image. 
         image.setAttribute('src', snap);
         image.classList.add("visible");
@@ -87,6 +93,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Pause video playback of stream. Comment it to keep video playing even after taking snapshot
         // video.pause();
+
+        
+        $.ajax({
+            url: queryURL,
+            method: 'POST'
+        }).then(function(response){
+            console.log(response);
+        });
 
     });
 
@@ -161,8 +175,9 @@ document.addEventListener('DOMContentLoaded', function () {
         controls.classList.remove("visible");
         start_camera.classList.remove("visible");
         video.classList.remove("visible");
-        snap.classList.remove("visible");
+        // snap.classList.remove("visible");
         error_message.classList.remove("visible");
     }
 
 });
+
