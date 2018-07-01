@@ -16,19 +16,73 @@
     <title>Moodify</title>
 </head>
 <body>
-    <div class="row titleRow">
-        <h1 class="">Moodify</h1>
-    </div>
-    <div class="container" id="header">
+
+    <div class="container header" id="header">
+
         
         <div class="row">
 
-            <h1 class="col s12"> Moodify </h1>
+            <h1 class="col s12 z-depth-4"> Moodify </h1>
 
         </div>
         
     </div>
+
     <div class="container">
+
+        <div class="row">
+            <div class="col s12 m4 l3 sidebar">
+
+                <div class=" container app">
+            
+                <!-- This is a click link for mobile browsers to start the video. Video camera on computer browsers start automatically. -->
+                <a href="#" id="start-camera" class="visible"></a>
+                <p class="flow-text"> Take a selfie to check you mood! We'll check to see what kind of music to put it to.</p>
+                <video muted id="camera-stream"></video>
+                <img id="snap">
+            
+                <p id="error-message"></p>
+            
+                <!-- Links with click functions -->
+                <div class="controls">
+                    <a href="#" id="take-photo" title="Take Photo"><i class="material-icons btn-small">TakeScreenshot</i></a>
+                    <a href="#" id="download-photo" download="selfie.png" title="Save Photo" class="disabled btn-small"><i class="material-icons">Download</i></a>  
+                    <a href="#" id="delete-photo" title="Delete Photo" class="disabled btn-small"><i class="material-icons">Delete</i></a>
+                </div>
+            
+                <!-- Hidden canvas element. Used for taking snapshot of video. -->
+                <!-- The hide class is used to prevent displaying the image within the canvas tag.
+                    The image already shows up in the img tag with the id "snap", so I wanted to hide this to prevent duplicates-->
+                    <canvas class="hide"></canvas>
+            
+                </div>
+        
+            </div>
+        
+            <div class="col s12 m8 l9 musicbar">
+                <h1>Your Music</h1>
+                <div>
+                    <h2>This is a placeholder. We will have to work out a way to bring in last.fm data.</h2>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+      <script>
+      // Register Service Worker.
+      if ('serviceWorker' in navigator) {
+          // Path is relative to the origin, not project root.
+          navigator.serviceWorker.register('/pwa-photobooth/sw.js')
+          .then(function(reg) {
+              console.log('Registration succeeded. Scope is ' + reg.scope);
+          })
+          .catch(function(error) {
+              console.error('Registration failed with ' + error);
+          });
+      }
+      </script>
+    <script src="assets/app.js"></script>
 
     <div class="row ">
 
@@ -76,5 +130,6 @@
     }
 </script>
 <script src="assets/app.js"></script>
+
 </body>
 </html>
