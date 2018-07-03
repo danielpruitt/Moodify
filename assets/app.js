@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // The getUserMedia interface is used for handling camera input.
     // Some browsers need a prefix so here we're covering all the options
-    navigator.getMedia = ( 
+    navigator.getMedia = (
         navigator.getUserMedia ||
         navigator.webkitGetUserMedia ||
         navigator.mozGetUserMedia ||
@@ -23,17 +23,17 @@ document.addEventListener('DOMContentLoaded', function () {
     );
 
 
-    if(!navigator.getMedia){
+    if (!navigator.getMedia) {
         displayErrorMessage("Your browser doesn't have support for the navigator.getUserMedia interface.");
     }
-    else{
+    else {
         // Request the camera.
         navigator.getMedia(
             {
                 video: true
             },
             // Success Callback
-            function(stream) {
+            function (stream) {
 
                 // Create an object URL for the video stream and
                 // set it as src of our HTLM video element.
@@ -41,13 +41,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 // Play the video element to start the stream.
                 video.play();
-                video.onplay = function() {
+                video.onplay = function () {
                     showVideo();
                 };
-         
+
             },
             // Error Callback
-            function(err) {
+            function (err) {
                 displayErrorMessage("There was an error with accessing the camera stream: " + err.name, err);
             }
         );
@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Mobile browsers cannot play video without user input,
     // so here we're using a button to start it manually.
-    start_camera.addEventListener("click", function(e) {
+    start_camera.addEventListener("click", function (e) {
 
         e.preventDefault();
 
@@ -68,17 +68,21 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
 
-    take_photo_btn.addEventListener("click", function(e) {
+    take_photo_btn.addEventListener("click", function (e) {
 
         e.preventDefault();
 
+        //this variable will store the base 64 image source
         var snap = takeSnapshot();
 
-        //var base64Snap = snap.replace("data:image/png;base64,", "");
-        var base64Snap = "https://image.shutterstock.com/image-photo/studio-shot-young-man-looking-260nw-372072697.jpg";
-        console.log(base64Snap);
-        var queryURL = "https://api-us.faceplusplus.com/facepp/v3/detect?api_key=NsFmyIYabjLQuaku8CsJAfNJ2cnHQGvb&api_secret=fq_pOSQXMz2UUZULckJHvx-Sg_0qgs_u&image_base64="+base64Snap;
+        //this is to remove the unnessesary string in the beginnning to pass through API
+        var base64Snap = snap.replace("data:image/png;base64,", '');
 
+        //Kairos app key(API key)
+        var appKey = "f74c4a76f8186a5c54d2afbe34015740";
+
+        //Kairos app ID(*This is also required)
+        var appID = "5989e8db";
 
         // Show image. 
         image.setAttribute('src', snap);
@@ -94,18 +98,47 @@ document.addEventListener('DOMContentLoaded', function () {
         // Pause video playback of stream. Comment it to keep video playing even after taking snapshot
         // video.pause();
 
-        
-        $.ajax({
-            url: queryURL,
-            method: 'POST'
-        }).then(function(response){
-            console.log(response);
-        });
+        /////////////////////////////////////////////
+        //This is the code that retrieves JSOn object by passing through the authetication and required parameters
+        //This is in the format of XMLHttpRequest, which is the regular form of .ajax. 
+        //Later on, lets see if we can reformat this to an ajax function
+
+        //PLEASE NOTE: Free API key is limited to 25 transactions/min and capped at 1,500/day.
+        //Try to limit the number of requests when testing, especially when we have multiple people working on this. 
+
+
+        //PLEASE INSTALL THIS BEFORE USING TO AVOID CORS ISSUE: https://chrome.google.com/webstore/detail/cors-toggle/jioikioepegflmdnbocfhgmpmopmjkim?hl=en
+        var request = new XMLHttpRequest();
+
+        request.open('POST', 'https://api.kairos.com/detect');
+
+        request.setRequestHeader('Content-Type', 'application/json');
+        request.setRequestHeader('app_id', appID);
+        request.setRequestHeader('app_key', appKey);
+
+        request.onreadystatechange = function () {
+
+            //readystate for XMLHttpRequest returns what state the request is in, "unsent", "opened", "loading", "done", etc.
+            //readystate === 4 means if it is done.
+            if (this.readyState === 4) {
+                console.log('Status:', this.status);
+                console.log('Headers:', this.getAllResponseHeaders());
+                console.log('Body:', this.responseText);
+            }
+        };
+
+        var body = {
+            'image': base64Snap,
+            'selector': 'ROLL'
+        };
+
+        request.send(JSON.stringify(body));
+        //////////////////////////////////////////////////
 
     });
 
 
-    delete_photo_btn.addEventListener("click", function(e) {
+    delete_photo_btn.addEventListener("click", function (e) {
 
         e.preventDefault();
 
@@ -158,7 +191,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function displayErrorMessage(error_msg, error) {
         error = error || "";
-        if(error){
+        if (error) {
             console.error(error);
         }
 
@@ -168,7 +201,7 @@ document.addEventListener('DOMContentLoaded', function () {
         error_message.classList.add("visible");
     }
 
-   
+
     function hideUI() {
         // Helper function for clearing the app UI.
 
