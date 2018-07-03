@@ -36,7 +36,7 @@
                 <div class=" container app">
             
                 <!-- This is a click link for mobile browsers to start the video. Video camera on computer browsers start automatically. -->
-                <a href="#" id="start-camera" class="visible"></a>
+                <a href="#" id="start-camera" class="visible">Touch here to start the app.</a>
                 <p class="flow-text"> Take a selfie to check you mood! We'll check to see what kind of music to put it to.</p>
                 <video muted id="camera-stream"></video>
                 <img id="snap">
@@ -122,20 +122,20 @@
 
     </div>
 
-      <script>
-      // Register Service Worker.
-      if ('serviceWorker' in navigator) {
-          // Path is relative to the origin, not project root.
-          navigator.serviceWorker.register('/pwa-photobooth/sw.js')
-          .then(function(reg) {
-              console.log('Registration succeeded. Scope is ' + reg.scope);
-          })
-          .catch(function(error) {
-              console.error('Registration failed with ' + error);
-          });
-      }
-      </script>
-   
+<script>
+    // Register Service Worker.
+    if ('serviceWorker' in navigator) {
+        // Path is relative to the origin, not project root.
+        navigator.serviceWorker.register('/ProjectOne/sw.js')
+        .then(function(reg) {
+            console.log('Registration succeeded. Scope is ' + reg.scope);
+        })
+        .catch(function(error) {
+            console.error('Registration failed with ' + error);
+        });
+    }
+</script>
+<script src="assets/app.js"></script>
 
 </body>
 </html>
