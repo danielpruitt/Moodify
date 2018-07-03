@@ -56,6 +56,59 @@
                     <canvas class="hide"></canvas>
             
                 </div>
+
+                <div>
+                    <form class="card-panel hoverable" action = "#">
+                        <p>
+                            <label>
+                                <input name="mood1" type="radio" class="with-gap" />
+                                <span for="mood1">Anger</span>
+                            </label>
+                        </p>
+
+                        <p>
+                            <label>
+                                <input name="mood2" type="radio" class="with-gap" />
+                                <span for="mood2">Disgust</span>
+                            </label>
+                        </p>
+
+                        <p>
+                            <label>
+                                <input name="mood3" type="radio" class="with-gap" />
+                                <span for="mood3">Fear</span>
+                            </label>
+                        </p>
+
+                        <p>
+                            <label> 
+                                <input name="mood4" type="radio" class="with-gap" />
+                                <span for="mood4">Happiness</span>
+                            </label>
+                        </p>
+
+                        <p>
+                            <label>
+                                <input name="mood5" type="radio" class="with-gap" />
+                                <span for="mood5">Neutral</span>
+                            </label>
+                        </p>
+
+                        <p>
+                            <label>
+                                <input name="mood6" type="radio" class="with-gap" />
+                                <span for="mood6">Sadness</span>
+                            </label>
+                        </p>
+
+                        <p>
+                            <label>
+                                <input name="mood7" type="radio" class="with-gap" />
+                                <span for="mood7">Suprise</span>
+                            </label>
+                        </p>
+                    </form>
+                </div>
         
             </div>
         
@@ -82,54 +135,7 @@
           });
       }
       </script>
-    <script src="assets/app.js"></script>
-
-    <div class="row ">
-
-        <div class="col s12 m4 l3 user-input">
-            <div class="app ">
-            <!-- This is a click link for mobile browsers to start the video. Video camera on computer browsers start automatically. -->
-            <a href="#" id="start-camera" class="visible">Touch here to start the app.</a>
-
-            <video muted id="camera-stream"></video>
-            <img id="snap">
-        
-            <p id="error-message"></p>
-        
-            <!-- Links with click functions -->
-            <div class="controls">
-                <a href="#" id="take-photo" title="Take Photo " class="waves-effect waves-light btn-small"><i class="material-icons">Take Screenshot</i></a>
-                <a href="#" id="download-photo" download="selfie.png" title="Save Photo" class="disabled waves-effect waves-light btn-small"><i class="material-icons">Download Snapshot</i></a>
-                <a href="#" id="delete-photo" title="Delete Photo" class="disabled waves-effect waves-light btn-small"><i class="material-icons">Delete</i></a>  
-            </div>
-        
-            <!-- Hidden canvas element. Used for taking snapshot of video. -->
-            <!-- The hide class is used to prevent displaying the image within the canvas tag.
-                The image already shows up in the img tag with the id "snap", so I wanted to hide this to prevent duplicates-->
-                <canvas class="hide"></canvas>
-            </div>
-         </div>
-
-         <div class="col s12 m8 l9">
-
-
-         </div>
-    </div>
-
-<script>
-    // Register Service Worker.
-    if ('serviceWorker' in navigator) {
-        // Path is relative to the origin, not project root.
-        navigator.serviceWorker.register('/pwa-photobooth/sw.js')
-        .then(function(reg) {
-            console.log('Registration succeeded. Scope is ' + reg.scope);
-        })
-        .catch(function(error) {
-            console.error('Registration failed with ' + error);
-        });
-    }
-</script>
-<script src="assets/app.js"></script>
+   
 
 </body>
 </html>
