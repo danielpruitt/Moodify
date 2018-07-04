@@ -1,35 +1,65 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
 </head>
+
 <body>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script>
         var client_id = '2752cb9f8d0940aeb25e5c564dd68a1e';
         var client_secret = '07c7345aa3c6424289bb28e7e27b919f';
-        var access_token = 'BQC-M5mZ_f3JDLXx7HPYWhyPa1Hs7wnsXJDfFq0l2DeDSm2btxaV-guQ3kg_giRZmDVDLrX9GQETJYm23bA';
-        $.ajax({
-            url: 'https://cors-anywhere.herokuapp.com/https://accounts.spotify.com/api/token',
-            method: "POST",
-            data: {
-                grant_type: "client_credentials"
-            },
-            headers: {
-                Authorization: "Basic " + btoa(client_id + ":" + client_secret)
-            }
-        }).then(res => console.log(res)).catch(err => console.error(err));
+        var access_token;
 
-        $.ajax({
-            url: 'your-spotify-url-here',
-            method: 'POST',
-            headers: {
-                Authorization: 'Basic ' + access_token
-            }
-        }).then(res => console.log(res)).catch(err => console.error(err));
+        function generateAccessToken(cb) {
+            $.ajax({
+                url: 'https://cors-anywhere.herokuapp.com/https://accounts.spotify.com/api/token',
+                method: "POST",
+                data: {
+                    grant_type: "client_credentials"
+                },
+                headers: {
+                    Authorization: "Basic " + btoa(client_id + ":" + client_secret)
+                }
+            }).then(res => {
+                access_token = res.access_token;
+                cb();
+            }).catch(err => console.error(err));
+        }
+
+        function getArtist(artist, cb) {
+            $.ajax({
+                method: 'GET',
+                url: 'https://api.spotify.com/v1/search',
+                data: {
+                    q: artist,
+                    type: 'track'
+                },
+                headers: {
+                    Authorization: "Bearer " + access_token
+                }
+            }).then(cb).catch(() => generateAccessToken(() => getArtist(artist, cb)));
+        }
+
+        getArtist('rush', function(data) {
+            console.log(data);
+        });
+
+        // function getMyPlaylists(playlist, cb) {
+        //     $.ajax({
+        //         url: `https://api.spotify.com/v1/users/me/playlists/{19PgP2QSGPcm6Ve8Vhbtp`,
+        //         method: 'POST',
+        //         headers: {
+        //             Authorization: 'Basic ' + access_token
+        //         }
+    
+        //     }).then(cb).catch(() => generateAccessToken(() => getArtist(playlist, cb)));
+        // }
     </script>
 </body>
+
 </html>
