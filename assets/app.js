@@ -135,6 +135,49 @@ document.addEventListener('DOMContentLoaded', function () {
         request.send(JSON.stringify(body));
         //////////////////////////////////////////////////
 
+
+
+        // SPOTIFY API gotes here 
+        var client_id = '2752cb9f8d0940aeb25e5c564dd68a1e';
+        var client_secret = '07c7345aa3c6424289bb28e7e27b919f';
+        var access_token;
+
+        function generateAccessToken(cb) {
+            $.ajax({
+                url: 'https://cors-anywhere.herokuapp.com/https://accounts.spotify.com/api/token',
+                method: "POST",
+                data: {
+                    grant_type: "client_credentials"
+                },
+                headers: {
+                    Authorization: "Basic " + btoa(client_id + ":" + client_secret)
+                }
+            }).then(res => {
+                access_token = res.access_token;
+                cb();
+            }).catch(err => console.error(err));
+        }
+
+        function getArtist(playlist, cb) {
+            $.ajax({
+                method: 'GET',
+                url: 'https://api.spotify.com/v1/search',
+                data: {
+                    q: playlist,
+                    type: 'playlist'
+                },
+                headers: {
+                    Authorization: "Bearer " + access_token
+                }
+            }).then(cb).catch(() => generateAccessToken(() => getArtist(playlist, cb)));
+        }
+
+        getArtist('anger', function(data) {
+            console.log(data);
+            var mood = data.playlists.items[2]
+            console.log(mood)
+            // $("#musicEmotion").append(mood)
+        });
     });
 
 
