@@ -77,6 +77,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         //this is to remove the unnessesary string in the beginnning to pass through API
         var base64Snap = snap.replace("data:image/png;base64,", '');
+        //var base64Snap = "https://image.shutterstock.com/image-photo/portrait-old-man-260nw-169463840.jpg";
 
         //Kairos app key(API key)
         var appKey = "f74c4a76f8186a5c54d2afbe34015740";
@@ -104,37 +105,28 @@ document.addEventListener('DOMContentLoaded', function () {
         //Later on, lets see if we can reformat this to an ajax function
 
         //PLEASE NOTE: Free API key is limited to 25 transactions/min and capped at 1,500/day.
-        //Try to limit the number of requests when testing, especially when we have multiple people working on this. 
-
-
-        //PLEASE INSTALL THIS BEFORE USING TO AVOID CORS ISSUE: https://chrome.google.com/webstore/detail/cors-toggle/jioikioepegflmdnbocfhgmpmopmjkim?hl=en
-        var request = new XMLHttpRequest();
-
-        request.open('POST', 'https://api.kairos.com/detect');
-
-        request.setRequestHeader('Content-Type', 'application/json');
-        request.setRequestHeader('app_id', appID);
-        request.setRequestHeader('app_key', appKey);
-
-        request.onreadystatechange = function () {
-
-            //readystate for XMLHttpRequest returns what state the request is in, "unsent", "opened", "loading", "done", etc.
-            //readystate === 4 means if it is done.
-            if (this.readyState === 4) {
-                console.log('Status:', this.status);
-                console.log('Headers:', this.getAllResponseHeaders());
-                console.log('Body:', this.responseText);
-            }
-        };
-
-        var body = {
-            'image': base64Snap,
-            'selector': 'ROLL'
-        };
-
-        request.send(JSON.stringify(body));
+        //Try to limit the number of requests when testing, especially when we have multiple people working on this.
         //////////////////////////////////////////////////
 
+        var headers = {
+            "Content-type": "application/json",
+            "app_id": appID,
+            "app_key": appKey
+        };
+
+        var payload = { "image": base64Snap};
+
+        var url = "http://api.kairos.com/detect";
+
+        // make request 
+        $.ajax(url, {
+            headers: headers,
+            type: "POST",
+            data: JSON.stringify(payload),
+            dataType: "text"
+        }).done(function (response) {
+            console.log(JSON.parse(response).images[0].faces[0]);
+        });
     });
 
 
