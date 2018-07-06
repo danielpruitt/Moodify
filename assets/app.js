@@ -1,5 +1,3 @@
-// JS goes here
-
 document.addEventListener('DOMContentLoaded', function () {
 
     // References to all the element we will need.
@@ -72,6 +70,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
         e.preventDefault();
 
+        $("#camera-stream").addClass("hide");
+
         //this variable will store the base 64 image source
         var snap = takeSnapshot();
 
@@ -97,7 +97,7 @@ document.addEventListener('DOMContentLoaded', function () {
         download_photo_btn.href = snap;
 
         // Pause video playback of stream. Comment it to keep video playing even after taking snapshot
-        // video.pause();
+        video.pause();
 
         /////////////////////////////////////////////
         //This is the code that retrieves JSOn object by passing through the authetication and required parameters
@@ -114,7 +114,7 @@ document.addEventListener('DOMContentLoaded', function () {
             "app_key": appKey
         };
 
-        var payload = { "image": base64Snap};
+        var payload = { "image": base64Snap };
 
         var url = "http://api.kairos.com/detect";
 
@@ -129,80 +129,126 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
+////////////////////////////////////////////////////
+        // SPOTIFY API gotes here 
+        var client_id = '2752cb9f8d0940aeb25e5c564dd68a1e';
+        var client_secret = '07c7345aa3c6424289bb28e7e27b919f';
+        var access_token;
 
-    delete_photo_btn.addEventListener("click", function (e) {
-
-        e.preventDefault();
-
-        // Hide image.
-        image.setAttribute('src', "");
-        image.classList.remove("visible");
-
-        // Disable delete and save buttons
-        delete_photo_btn.classList.add("disabled");
-        download_photo_btn.classList.add("disabled");
-
-
-        // Resume playback of stream.
-        video.play();
-
-    });
-
-
-
-    function takeSnapshot() {
-        // Here we're using a trick that involves a hidden canvas element.  
-
-        var hidden_canvas = document.querySelector('canvas'),
-            context = hidden_canvas.getContext('2d');
-
-        var width = video.videoWidth,
-            height = video.videoHeight;
-
-        if (width && height) {
-
-            // Setup a canvas with the same dimensions as the video.
-            hidden_canvas.width = width;
-            hidden_canvas.height = height;
-
-            // Make a copy of the current frame in the video on the canvas.
-            context.drawImage(video, 0, 0, width, height);
-
-            // Turn the canvas image into a dataURL that can be used as a src for our photo.
-            return hidden_canvas.toDataURL('image/png');
-        }
-    }
-
-
-    function showVideo() {
-        hideUI();
-        video.classList.add("visible");
-        controls.classList.add("visible");
-    }
-
-
-    function displayErrorMessage(error_msg, error) {
-        error = error || "";
-        if (error) {
-            console.error(error);
+        function generateAccessToken(cb) {
+            $.ajax({
+                url: 'https://cors-anywhere.herokuapp.com/https://accounts.spotify.com/api/token',
+                method: "POST",
+                data: {
+                    grant_type: "client_credentials"
+                },
+                headers: {
+                    Authorization: "Basic " + btoa(client_id + ":" + client_secret)
+                }
+            }).then(res => {
+                access_token = res.access_token;
+                cb();
+            }).catch(err => console.error(err));
         }
 
-        error_message.innerText = error_msg;
+        function getArtist(playlist, cb) {
+            $.ajax({
+                method: 'GET',
+                url: 'https://api.spotify.com/v1/search',
+                data: {
+                    q: playlist,
+                    type: 'playlist'
+                },
+                headers: {
+                    Authorization: "Bearer " + access_token
+                }
+            }).then(cb).catch(() => generateAccessToken(() => getArtist(playlist, cb)));
+        }
 
-        hideUI();
-        error_message.classList.add("visible");
-    }
+        getArtist('anger', function (data) {
+            console.log(data);
+            var mood = data.playlists.items[2]
+            console.log(mood)
+            // $("#musicEmotion").append(mood)
+        });
+
+/////////////////////////////////////////////////
+
+        delete_photo_btn.addEventListener("click", function (e) {
+
+            e.preventDefault();
+
+            // Hide image.
+            image.setAttribute('src', "");
+            image.classList.remove("visible");
+
+            // Disable delete and save buttons
+            delete_photo_btn.classList.add("disabled");
+            download_photo_btn.classList.add("disabled");
+
+            $("#camera-stream").removeClass("hide");
+
+            // Resume playback of stream.
+            video.play();
+
+        });
 
 
-    function hideUI() {
-        // Helper function for clearing the app UI.
 
-        controls.classList.remove("visible");
-        start_camera.classList.remove("visible");
-        video.classList.remove("visible");
-        // snap.classList.remove("visible");
-        error_message.classList.remove("visible");
-    }
+        function takeSnapshot() {
+            // Here we're using a trick that involves a hidden canvas element.  
+
+            var hidden_canvas = document.querySelector('canvas'),
+                context = hidden_canvas.getContext('2d');
+
+            var width = video.videoWidth,
+                height = video.videoHeight;
+
+            if (width && height) {
+
+                // Setup a canvas with the same dimensions as the video.
+                hidden_canvas.width = width;
+                hidden_canvas.height = height;
+
+                // Make a copy of the current frame in the video on the canvas.
+                context.drawImage(video, 0, 0, width, height);
+
+                // Turn the canvas image into a dataURL that can be used as a src for our photo.
+                return hidden_canvas.toDataURL('image/png');
+            }
+        }
+
+
+        function showVideo() {
+            hideUI();
+            video.classList.add("visible");
+            controls.classList.add("visible");
+        }
+
+
+        function displayErrorMessage(error_msg, error) {
+            error = error || "";
+            if (error) {
+                console.error(error);
+            }
+
+            error_message.innerText = error_msg;
+
+            hideUI();
+            error_message.classList.add("visible");
+        }
+
+
+        function hideUI() {
+            // Helper function for clearing the app UI.
+
+            controls.classList.remove("visible");
+            start_camera.classList.remove("visible");
+            video.classList.remove("visible");
+            // snap.classList.remove("visible");
+            error_message.classList.remove("visible");
+        }
+
 
 });
 
