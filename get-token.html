@@ -23,6 +23,16 @@
         var client_secret = '07c7345aa3c6424289bb28e7e27b919f';
         var access_token;
 
+        var anger;
+        var disgust;
+        var happiness;
+        var neutral;
+        var sadness;
+        var suprise;
+        var fear;
+
+        var userMood = "happy"
+
         function generateAccessToken(cb) {
             $.ajax({
                 url: 'https://cors-anywhere.herokuapp.com/https://accounts.spotify.com/api/token',
@@ -53,7 +63,7 @@
             }).then(cb).catch(() => generateAccessToken(() => getArtist(playlist, cb)));
         }
 
-        getArtist('anger', function(data) {
+        getArtist(userMood, function(data) {
             console.log(data);
             var playlistArray = data.playlists.items;
             

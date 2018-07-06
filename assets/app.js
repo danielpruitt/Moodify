@@ -130,7 +130,19 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
 ////////////////////////////////////////////////////
-        // SPOTIFY API gotes here 
+        // SPOTIFY API goes here 
+
+        //variables for spotify moods
+        var anger;
+        var disgust;
+        var happiness;
+        var neutral;
+        var sadness;
+        var suprise;
+        var fear;
+
+        var userMood = "anger"
+
         var client_id = '2752cb9f8d0940aeb25e5c564dd68a1e';
         var client_secret = '07c7345aa3c6424289bb28e7e27b919f';
         var access_token;
@@ -151,7 +163,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }).catch(err => console.error(err));
         }
 
-        function getArtist(playlist, cb) {
+        function getPlaylist(playlist, cb) {
             $.ajax({
                 method: 'GET',
                 url: 'https://api.spotify.com/v1/search',
@@ -162,14 +174,37 @@ document.addEventListener('DOMContentLoaded', function () {
                 headers: {
                     Authorization: "Bearer " + access_token
                 }
-            }).then(cb).catch(() => generateAccessToken(() => getArtist(playlist, cb)));
+            }).then(cb).catch(() => generateAccessToken(() => getPlaylist(playlist, cb)));
         }
 
-        getArtist('anger', function (data) {
+        getPlaylist('anger', function (data) {
             console.log(data);
-            var mood = data.playlists.items[2]
-            console.log(mood)
-            // $("#musicEmotion").append(mood)
+            var playlistArray = data.playlists.items;
+            
+            for(var i=0; i < playlistArray.length; i++){
+                var mood = playlistArray[i];
+
+                var musicEmotion= $("#musicEmotion")
+                var linkDiv = $("<div class= 'hoverable card-panel playlistContainer  '>");
+                var allLists = data.playlists.items[i].external_urls.spotify;
+        
+                var img = data.playlists.items[i].images[0].url;
+                console.log(img)
+                var playArt = $("<img>");
+                playArt.addClass("albumSize");
+                playArt.attr("src", img);
+            
+                var playName = data.playlists.items[i].name;
+                var p = $("<p>").prepend(playName)
+
+                var link = $("<a>").text(data.playlists.items[i].external_urls.spotify);
+                link.attr("href", allLists);
+                link.text("Go to playlist!");
+                link.attr("target", "blank")
+                linkDiv.append(p);
+                linkDiv.append(link);
+                linkDiv.append(playArt);
+                musicEmotion.append(linkDiv);
         });
 
 /////////////////////////////////////////////////
