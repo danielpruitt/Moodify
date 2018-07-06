@@ -158,7 +158,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }).catch(err => console.error(err));
         }
 
-        function getArtist(playlist, cb) {
+        function getPLaylist(playlist, cb) {
             $.ajax({
                 method: 'GET',
                 url: 'https://api.spotify.com/v1/search',
@@ -169,14 +169,36 @@ document.addEventListener('DOMContentLoaded', function () {
                 headers: {
                     Authorization: "Bearer " + access_token
                 }
-            }).then(cb).catch(() => generateAccessToken(() => getArtist(playlist, cb)));
+            }).then(cb).catch(() => generateAccessToken(() => getPLaylist(playlist, cb)));
         }
-
-        getArtist('anger', function(data) {
+        var anger;
+        var disgust;
+        var fear;
+        var happiness;
+        var neutral;
+        var sadness;
+        var suprise;
+        
+        getPLaylist('anger', function(data) {
             console.log(data);
-            var mood = data.playlists.items[2]
-            console.log(mood)
-            // $("#musicEmotion").append(mood)
+            var playlistArray = data.playlists.items;
+
+            for(var i=0; i < playlistArray.length; i++){
+                var mood = playlistArray[i];
+
+                var musicEmotion= $("#musicEmotion")
+                var linkDiv = $("<div class= 'item card-panel hoverable'>");
+                var allLists = data.playlists.items[i].external_urls.spotify;
+                console.log(allLists)
+                
+                var link = $("<a>").text(data.playlists.items[i].external_urls.spotify);
+                link.attr("href", allLists);
+                link.text("Go to playlist!");
+                link.attr("target", "blank")
+                linkDiv.append(link);
+                musicEmotion.append(linkDiv);
+            }
+    
         });
     });
 
