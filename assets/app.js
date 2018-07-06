@@ -135,6 +135,12 @@ document.addEventListener('DOMContentLoaded', function () {
         var client_secret = '07c7345aa3c6424289bb28e7e27b919f';
         var access_token;
 
+        var userMood
+        $("#submitEmotion").on("click", function (event){
+            event.preventDefault();
+            var submittedMood = $("#userInputMood").val().trim();
+            console.log(submittedMood)
+            
         function generateAccessToken(cb) {
             $.ajax({
                 url: 'https://cors-anywhere.herokuapp.com/https://accounts.spotify.com/api/token',
@@ -165,12 +171,39 @@ document.addEventListener('DOMContentLoaded', function () {
             }).then(cb).catch(() => generateAccessToken(() => getArtist(playlist, cb)));
         }
 
-        getArtist('anger', function (data) {
+        getArtist(submittedMood, function (data) {
             console.log(data);
-            var mood = data.playlists.items[2]
-            console.log(mood)
-            // $("#musicEmotion").append(mood)
+            var playlistArray = data.playlists.items;
+            
+            for(var i=0; i < playlistArray.length; i++){
+            var mood = playlistArray[i];
+
+            var musicEmotion= $("#musicEmotion")
+            var linkDiv = $("<div class= 'hoverable card-panel playlistContainer  '>");
+            var allLists = data.playlists.items[i].external_urls.spotify;
+        
+            var img = data.playlists.items[i].images[0].url;
+            console.log(img)
+            var playArt = $("<img>");
+            playArt.addClass("albumSize");
+            playArt.attr("src", img);
+            
+            var playName = data.playlists.items[i].name;
+            var playlistTitle = $("<p>").prepend(playName)
+
+            var link = $("<a>").text(data.playlists.items[i].external_urls.spotify);
+            link.attr("href", allLists);
+            link.text("Go to playlist!");
+            link.attr("target", "blank")
+            linkDiv.append(playlistTitle);
+            linkDiv.append(link);
+            linkDiv.append(playArt);
+    
+            musicEmotion.prepend(linkDiv);
+        }
         });
+
+    }); //end of on click
 
 /////////////////////////////////////////////////
 
