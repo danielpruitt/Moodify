@@ -1,5 +1,3 @@
-// JS goes here
-
 document.addEventListener('DOMContentLoaded', function () {
 
     // References to all the element we will need.
@@ -72,11 +70,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
         e.preventDefault();
 
+        $("#camera-stream").addClass("hide");
+
         //this variable will store the base 64 image source
         var snap = takeSnapshot();
 
         //this is to remove the unnessesary string in the beginnning to pass through API
         var base64Snap = snap.replace("data:image/png;base64,", '');
+        //var base64Snap = "https://image.shutterstock.com/image-photo/portrait-old-man-260nw-169463840.jpg";
 
         //Kairos app key(API key)
         var appKey = "f74c4a76f8186a5c54d2afbe34015740";
@@ -96,7 +97,7 @@ document.addEventListener('DOMContentLoaded', function () {
         download_photo_btn.href = snap;
 
         // Pause video playback of stream. Comment it to keep video playing even after taking snapshot
-        // video.pause();
+        video.pause();
 
         /////////////////////////////////////////////
         //This is the code that retrieves JSOn object by passing through the authetication and required parameters
@@ -104,39 +105,31 @@ document.addEventListener('DOMContentLoaded', function () {
         //Later on, lets see if we can reformat this to an ajax function
 
         //PLEASE NOTE: Free API key is limited to 25 transactions/min and capped at 1,500/day.
-        //Try to limit the number of requests when testing, especially when we have multiple people working on this. 
-
-
-        //PLEASE INSTALL THIS BEFORE USING TO AVOID CORS ISSUE: https://chrome.google.com/webstore/detail/cors-toggle/jioikioepegflmdnbocfhgmpmopmjkim?hl=en
-        var request = new XMLHttpRequest();
-
-        request.open('POST', 'https://api.kairos.com/detect');
-
-        request.setRequestHeader('Content-Type', 'application/json');
-        request.setRequestHeader('app_id', appID);
-        request.setRequestHeader('app_key', appKey);
-
-        request.onreadystatechange = function () {
-
-            //readystate for XMLHttpRequest returns what state the request is in, "unsent", "opened", "loading", "done", etc.
-            //readystate === 4 means if it is done.
-            if (this.readyState === 4) {
-                console.log('Status:', this.status);
-                console.log('Headers:', this.getAllResponseHeaders());
-                console.log('Body:', this.responseText);
-            }
-        };
-
-        var body = {
-            'image': base64Snap,
-            'selector': 'ROLL'
-        };
-
-        request.send(JSON.stringify(body));
+        //Try to limit the number of requests when testing, especially when we have multiple people working on this.
         //////////////////////////////////////////////////
 
+        var headers = {
+            "Content-type": "application/json",
+            "app_id": appID,
+            "app_key": appKey
+        };
 
+        var payload = { "image": base64Snap };
 
+        var url = "http://api.kairos.com/detect";
+
+        // make request 
+        $.ajax(url, {
+            headers: headers,
+            type: "POST",
+            data: JSON.stringify(payload),
+            dataType: "text"
+        }).done(function (response) {
+            console.log(JSON.parse(response).images[0].faces[0]);
+        });
+    });
+
+////////////////////////////////////////////////////
         // SPOTIFY API gotes here 
         var client_id = '2752cb9f8d0940aeb25e5c564dd68a1e';
         var client_secret = '07c7345aa3c6424289bb28e7e27b919f';
@@ -172,88 +165,90 @@ document.addEventListener('DOMContentLoaded', function () {
             }).then(cb).catch(() => generateAccessToken(() => getArtist(playlist, cb)));
         }
 
-        getArtist('anger', function(data) {
+        getArtist('anger', function (data) {
             console.log(data);
             var mood = data.playlists.items[2]
             console.log(mood)
             // $("#musicEmotion").append(mood)
         });
-    });
+
+/////////////////////////////////////////////////
+
+        delete_photo_btn.addEventListener("click", function (e) {
+
+            e.preventDefault();
+
+            // Hide image.
+            image.setAttribute('src', "");
+            image.classList.remove("visible");
+
+            // Disable delete and save buttons
+            delete_photo_btn.classList.add("disabled");
+            download_photo_btn.classList.add("disabled");
+
+            $("#camera-stream").removeClass("hide");
+
+            // Resume playback of stream.
+            video.play();
+
+        });
 
 
-    delete_photo_btn.addEventListener("click", function (e) {
 
-        e.preventDefault();
+        function takeSnapshot() {
+            // Here we're using a trick that involves a hidden canvas element.  
 
-        // Hide image.
-        image.setAttribute('src', "");
-        image.classList.remove("visible");
+            var hidden_canvas = document.querySelector('canvas'),
+                context = hidden_canvas.getContext('2d');
 
-        // Disable delete and save buttons
-        delete_photo_btn.classList.add("disabled");
-        download_photo_btn.classList.add("disabled");
+            var width = video.videoWidth,
+                height = video.videoHeight;
 
+            if (width && height) {
 
-        // Resume playback of stream.
-        video.play();
+                // Setup a canvas with the same dimensions as the video.
+                hidden_canvas.width = width;
+                hidden_canvas.height = height;
 
-    });
+                // Make a copy of the current frame in the video on the canvas.
+                context.drawImage(video, 0, 0, width, height);
 
-
-
-    function takeSnapshot() {
-        // Here we're using a trick that involves a hidden canvas element.  
-
-        var hidden_canvas = document.querySelector('canvas'),
-            context = hidden_canvas.getContext('2d');
-
-        var width = video.videoWidth,
-            height = video.videoHeight;
-
-        if (width && height) {
-
-            // Setup a canvas with the same dimensions as the video.
-            hidden_canvas.width = width;
-            hidden_canvas.height = height;
-
-            // Make a copy of the current frame in the video on the canvas.
-            context.drawImage(video, 0, 0, width, height);
-
-            // Turn the canvas image into a dataURL that can be used as a src for our photo.
-            return hidden_canvas.toDataURL('image/png');
-        }
-    }
-
-
-    function showVideo() {
-        hideUI();
-        video.classList.add("visible");
-        controls.classList.add("visible");
-    }
-
-
-    function displayErrorMessage(error_msg, error) {
-        error = error || "";
-        if (error) {
-            console.error(error);
+                // Turn the canvas image into a dataURL that can be used as a src for our photo.
+                return hidden_canvas.toDataURL('image/png');
+            }
         }
 
-        error_message.innerText = error_msg;
 
-        hideUI();
-        error_message.classList.add("visible");
-    }
+        function showVideo() {
+            hideUI();
+            video.classList.add("visible");
+            controls.classList.add("visible");
+        }
 
 
-    function hideUI() {
-        // Helper function for clearing the app UI.
+        function displayErrorMessage(error_msg, error) {
+            error = error || "";
+            if (error) {
+                console.error(error);
+            }
 
-        controls.classList.remove("visible");
-        start_camera.classList.remove("visible");
-        video.classList.remove("visible");
-        // snap.classList.remove("visible");
-        error_message.classList.remove("visible");
-    }
+            error_message.innerText = error_msg;
+
+            hideUI();
+            error_message.classList.add("visible");
+        }
+
+
+        function hideUI() {
+            // Helper function for clearing the app UI.
+
+            controls.classList.remove("visible");
+            start_camera.classList.remove("visible");
+            video.classList.remove("visible");
+            // snap.classList.remove("visible");
+            error_message.classList.remove("visible");
+        }
+
 
 });
 

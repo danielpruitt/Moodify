@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,26 +8,21 @@
     <link rel="stylesheet" href="assets/style.css">
     <!--Importing font from google fonts on line below this-->
     <link rel="shortcut icon" type="image/jpeg" href="assets/images/moodify_logo.jpeg">
-    <link href="https://fonts.googleapis.com/css?family=Galada" rel="stylesheet"> 
+    <link href="https://fonts.googleapis.com/css?family=Galada" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-rc.2/css/materialize.min.css">
-    <link rel="manifest" href="manifest.json">
     <link rel="stylesheet" href="assets/style.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-rc.2/js/materialize.min.js"></script>         
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-rc.2/js/materialize.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/5.1.0/firebase.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <title>Moodify</title>
 </head>
+
 <body>
 
     <div class="container header" id="header">
-
-        
         <div class="row">
-
             <h1 class="col s12 z-depth-4"> Moodify </h1>
-
         </div>
-        
     </div>
 
     <div class="container">
@@ -35,87 +31,74 @@
             <div class="col s12 m4 l3 sidebar">
 
                 <div class=" container app">
-            
-                <!-- This is a click link for mobile browsers to start the video. Video camera on computer browsers start automatically. -->
-                <a href="#" id="start-camera" class="visible">Touch here to start the app.</a>
-                <p class="flow-text"> Take a selfie to check you mood! We'll check to see what kind of music to put it to.</p>
-                <video muted id="camera-stream"></video>
-                <img id="snap">
-            
-                <p id="error-message"></p>
-            
-                <!-- Links with click functions -->
-                <div class="controls">
-                    <a href="#" id="take-photo" title="Take Photo"><i class="material-icons btn-small">TakeScreenshot</i></a>
-                    <a href="#" id="download-photo" download="selfie.png" title="Save Photo" class="disabled btn-small"><i class="material-icons">Download</i></a>  
-                    <a href="#" id="delete-photo" title="Delete Photo" class="disabled btn-small"><i class="material-icons">Delete</i></a>
-                </div>
-            
-                <!-- Hidden canvas element. Used for taking snapshot of video. -->
-                <!-- The hide class is used to prevent displaying the image within the canvas tag.
+
+                    <!-- This is a click link for mobile browsers to start the video. Video camera on computer browsers start automatically. -->
+                    <a href="#" id="start-camera" class="visible">Touch here to start the app.</a>
+                    <p class="flow-text"> Take a selfie to check you mood! We'll check to see what kind of music to put it to.</p>
+                    <video muted id="camera-stream"></video>
+                    <img id="snap">
+
+                    <p id="error-message"></p>
+
+                    <!-- Links with click functions -->
+                    <div class="controls">
+                        <a href="#" id="take-photo" title="Take Photo">
+                            <i class="material-icons btn-small">TakeScreenshot</i>
+                        </a>
+                        <a href="#" id="download-photo" download="selfie.png" title="Save Photo" class="disabled btn-small">
+                            <i class="material-icons">Download</i>
+                        </a>
+                        <a href="#" id="delete-photo" title="Delete Photo" class="disabled btn-small">
+                            <i class="material-icons">Delete</i>
+                        </a>
+                    </div>
+
+                    <!-- Hidden canvas element. Used for taking snapshot of video. -->
+                    <!-- The hide class is used to prevent displaying the image within the canvas tag.
                     The image already shows up in the img tag with the id "snap", so I wanted to hide this to prevent duplicates-->
                     <canvas class="hide"></canvas>
-            
+
                 </div>
 
                 <div>
-                    <form class="card-panel hoverable" action = "#">
-                        <p>
-                            <label>
-                                <input name="mood1" type="radio" class="with-gap" />
-                                <span for="mood1">Anger</span>
-                            </label>
-                        </p>
+                    <form class="card-panel hoverable" action="#">
 
-                        <p>
-                            <label>
-                                <input name="mood2" type="radio" class="with-gap" />
-                                <span for="mood2">Disgust</span>
-                            </label>
-                        </p>
+                        <label>
+                            <input name="mood" id="anger" type="radio" class="with-gap" />
+                            <span>Anger</span>
+                        </label>
+                        <label>
+                            <input name="mood" id="disgust" type="radio" class="with-gap" />
+                            <span>Disgust</span>
+                        </label>
+                        <label>
+                            <input name="mood" id="fear" type="radio" class="with-gap" />
+                            <span>Fear</span>
+                        </label>
+                        <label>
+                            <input name="mood" id="happiness" type="radio" class="with-gap" />
+                            <span>Happiness</span>
+                        </label>
+                        <label>
+                            <input name="mood" id="neutral" type="radio" class="with-gap" />
+                            <span>Neutral</span>
+                        </label>
+                        <label>
+                            <input name="mood" id="sadness" type="radio" class="with-gap" />
+                            <span>Sadness</span>
+                        </label>
+                        <label>
+                            <input name="mood" id="suprise" type="radio" class="with-gap" />
+                            <span>Suprise</span>
+                        </label>
 
-                        <p>
-                            <label>
-                                <input name="mood3" type="radio" class="with-gap" />
-                                <span for="mood3">Fear</span>
-                            </label>
-                        </p>
-
-                        <p>
-                            <label> 
-                                <input name="mood4" type="radio" class="with-gap" />
-                                <span for="mood4">Happiness</span>
-                            </label>
-                        </p>
-
-                        <p>
-                            <label>
-                                <input name="mood5" type="radio" class="with-gap" />
-                                <span for="mood5">Neutral</span>
-                            </label>
-                        </p>
-
-                        <p>
-                            <label>
-                                <input name="mood6" type="radio" class="with-gap" />
-                                <span for="mood6">Sadness</span>
-                            </label>
-                        </p>
-
-                        <p>
-                            <label>
-                                <input name="mood7" type="radio" class="with-gap" />
-                                <span for="mood7">Suprise</span>
-                            </label>
-                        </p>
                         <button class="btn waves-effect waves-light" type="submit" id="submitEmotion">Submit
                             <i class="material-icons right"></i>
                         </button>
                     </form>
                 </div>
-        
             </div>
-        
+
             <div class="col s12 m8 l9 musicbar">
                 <h1>Your Music</h1>
                 <div>
@@ -124,23 +107,10 @@
                 </div>
             </div>
         </div>
-
     </div>
-
-<script>
-    // Register Service Worker.
-    if ('serviceWorker' in navigator) {
-        // Path is relative to the origin, not project root.
-        navigator.serviceWorker.register('/ProjectOne/sw.js')
-        .then(function(reg) {
-            console.log('Registration succeeded. Scope is ' + reg.scope);
-        })
-        .catch(function(error) {
-            console.error('Registration failed with ' + error);
-        });
-    }
-</script>
-<script src="assets/app.js"></script>
+    
+    <script src="assets/app.js"></script>
 
 </body>
+
 </html>
