@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-rc.2/css/materialize.min.css">
+    <link rel= "stylesheet" href="assets/style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-rc.2/js/materialize.min.js"></script>
+    <title>Document</title>
+</head>
+
+<body>
+    <div id="playlists"></div>
+    <p> append playlists:
+        <div id="musicEmotion"></div>
+    </p>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script>
+        var client_id = '2752cb9f8d0940aeb25e5c564dd68a1e';
+        var client_secret = '07c7345aa3c6424289bb28e7e27b919f';
+        var access_token;
+
+        function generateAccessToken(cb) {
+            $.ajax({
+                url: 'https://cors-anywhere.herokuapp.com/https://accounts.spotify.com/api/token',
+                method: "POST",
+                data: {
+                    grant_type: "client_credentials"
+                },
+                headers: {
+                    Authorization: "Basic " + btoa(client_id + ":" + client_secret)
+                }
+            }).then(res => {
+                access_token = res.access_token;
+                cb();
+            }).catch(err => console.error(err));
+        }
+
+        function getArtist(playlist, cb) {
+            $.ajax({
+                method: 'GET',
+                url: 'https://api.spotify.com/v1/search',
+                data: {
+                    q: playlist,
+                    type: 'playlist'
+                },
+                headers: {
+                    Authorization: "Bearer " + access_token
+                }
+            }).then(cb).catch(() => generateAccessToken(() => getArtist(playlist, cb)));
+        }
+
+        getArtist('neutral', function(data) {
+            console.log(data);
+            var playlistArray = data.playlists.items;
+            // console.log(playlistArray)
+            for(var i=0; i < playlistArray.length; i++){
+                var mood = playlistArray[i];
+
+                var musicEmotion= $("#musicEmotion")
+                var linkDiv = $("<div class= 'hoverable card-panel playlistContainer  '>");
+                var allLists = data.playlists.items[i].external_urls.spotify;
+             
+                var img = data.playlists.items[i].images[0].url;
+                console.log(img)
+                var playArt = $("<img>");
+                playArt.addClass("albumSize");
+                playArt.attr("src", img);
+                
+                var playName = data.playlists.items[i].name;
+                var p = $("<p>").prepend(playName)
+
+                var link = $("<a>").text(data.playlists.items[i].external_urls.spotify);
+                link.attr("href", allLists);
+                link.text("Go to playlist!");
+                link.attr("target", "blank")
+                linkDiv.append(p);
+                linkDiv.append(link);
+                linkDiv.append(playArt);
+        
+                musicEmotion.append(linkDiv);
+            }
+        });
+
+        // getArtist('happy', function(data) {
+        //     console.log(data);
+        //     var playlistArray = data.playlists.items;
+        //     // console.log(playlistArray)
+        //     for(var i=0; i < playlistArray.length; i++){
+        //         var mood = playlistArray[i];
+
+        //         var musicEmotion= $("#musicEmotion")
+        //         var linkDiv = $("<div class= 'item card-panel hoverable'>");
+        //         var allLists = data.playlists.items[i].external_urls.spotify;
+        //         console.log(allLists)
+                
+        //         var link = $("<a>").text(data.playlists.items[i].external_urls.spotify);
+        //         link.attr("href", allLists);
+        //         link.text("Go to playlist!");
+        //         link.attr("target", "blank")
+        //         linkDiv.append(link);
+        //         musicEmotion.append(linkDiv);
+        //     }
+
+        // });
+
+        // function getMyPlaylists(playlist, cb) {
+        //     $.ajax({
+        //         url: `https://api.spotify.com/v1/users/me/playlists/{19PgP2QSGPcm6Ve8Vhbtp`,
+        //         method: 'POST',
+        //         headers: {
+        //             Authorization: 'Basic ' + access_token
+        //         }
+    
+        //     }).then(cb).catch(() => generateAccessToken(() => getArtist(playlist, cb)));
+        // }
+    </script>
+</body>
+
+</html>

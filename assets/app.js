@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // The getUserMedia interface is used for handling camera input.
     // Some browsers need a prefix so here we're covering all the options
-    navigator.getMedia = ( 
+    navigator.getMedia = (
         navigator.getUserMedia ||
         navigator.webkitGetUserMedia ||
         navigator.mozGetUserMedia ||
@@ -23,17 +23,17 @@ document.addEventListener('DOMContentLoaded', function () {
     );
 
 
-    if(!navigator.getMedia){
+    if (!navigator.getMedia) {
         displayErrorMessage("Your browser doesn't have support for the navigator.getUserMedia interface.");
     }
-    else{
+    else {
         // Request the camera.
         navigator.getMedia(
             {
                 video: true
             },
             // Success Callback
-            function(stream) {
+            function (stream) {
 
                 // Create an object URL for the video stream and
                 // set it as src of our HTLM video element.
@@ -41,13 +41,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 // Play the video element to start the stream.
                 video.play();
-                video.onplay = function() {
+                video.onplay = function () {
                     showVideo();
                 };
-         
+
             },
             // Error Callback
-            function(err) {
+            function (err) {
                 displayErrorMessage("There was an error with accessing the camera stream: " + err.name, err);
             }
         );
@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Mobile browsers cannot play video without user input,
     // so here we're using a button to start it manually.
-    start_camera.addEventListener("click", function(e) {
+    start_camera.addEventListener("click", function (e) {
 
         e.preventDefault();
 
@@ -68,11 +68,21 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
 
-    take_photo_btn.addEventListener("click", function(e) {
+    take_photo_btn.addEventListener("click", function (e) {
 
         e.preventDefault();
 
+        //this variable will store the base 64 image source
         var snap = takeSnapshot();
+
+        //this is to remove the unnessesary string in the beginnning to pass through API
+        var base64Snap = snap.replace("data:image/png;base64,", '');
+
+        //Kairos app key(API key)
+        var appKey = "f74c4a76f8186a5c54d2afbe34015740";
+
+        //Kairos app ID(*This is also required)
+        var appID = "5989e8db";
 
         // Show image. 
         image.setAttribute('src', snap);
@@ -88,10 +98,112 @@ document.addEventListener('DOMContentLoaded', function () {
         // Pause video playback of stream. Comment it to keep video playing even after taking snapshot
         // video.pause();
 
+        /////////////////////////////////////////////
+        //This is the code that retrieves JSOn object by passing through the authetication and required parameters
+        //This is in the format of XMLHttpRequest, which is the regular form of .ajax. 
+        //Later on, lets see if we can reformat this to an ajax function
+
+        //PLEASE NOTE: Free API key is limited to 25 transactions/min and capped at 1,500/day.
+        //Try to limit the number of requests when testing, especially when we have multiple people working on this. 
+
+
+        //PLEASE INSTALL THIS BEFORE USING TO AVOID CORS ISSUE: https://chrome.google.com/webstore/detail/cors-toggle/jioikioepegflmdnbocfhgmpmopmjkim?hl=en
+        var request = new XMLHttpRequest();
+
+        request.open('POST', 'https://api.kairos.com/detect');
+
+        request.setRequestHeader('Content-Type', 'application/json');
+        request.setRequestHeader('app_id', appID);
+        request.setRequestHeader('app_key', appKey);
+
+        request.onreadystatechange = function () {
+
+            //readystate for XMLHttpRequest returns what state the request is in, "unsent", "opened", "loading", "done", etc.
+            //readystate === 4 means if it is done.
+            if (this.readyState === 4) {
+                console.log('Status:', this.status);
+                console.log('Headers:', this.getAllResponseHeaders());
+                console.log('Body:', this.responseText);
+            }
+        };
+
+        var body = {
+            'image': base64Snap,
+            'selector': 'ROLL'
+        };
+
+        request.send(JSON.stringify(body));
+        //////////////////////////////////////////////////
+
+
+
+        // SPOTIFY API gotes here 
+        var client_id = '2752cb9f8d0940aeb25e5c564dd68a1e';
+        var client_secret = '07c7345aa3c6424289bb28e7e27b919f';
+        var access_token;
+
+        function generateAccessToken(cb) {
+            $.ajax({
+                url: 'https://cors-anywhere.herokuapp.com/https://accounts.spotify.com/api/token',
+                method: "POST",
+                data: {
+                    grant_type: "client_credentials"
+                },
+                headers: {
+                    Authorization: "Basic " + btoa(client_id + ":" + client_secret)
+                }
+            }).then(res => {
+                access_token = res.access_token;
+                cb();
+            }).catch(err => console.error(err));
+        }
+
+        function getPLaylist(playlist, cb) {
+            $.ajax({
+                method: 'GET',
+                url: 'https://api.spotify.com/v1/search',
+                data: {
+                    q: playlist,
+                    type: 'playlist'
+                },
+                headers: {
+                    Authorization: "Bearer " + access_token
+                }
+            }).then(cb).catch(() => generateAccessToken(() => getPLaylist(playlist, cb)));
+        }
+        var anger;
+        var disgust;
+        var fear;
+        var happiness;
+        var neutral;
+        var sadness;
+        var suprise;
+        
+        getPLaylist('anger', function(data) {
+            console.log(data);
+            var playlistArray = data.playlists.items;
+
+            for(var i=0; i < playlistArray.length; i++){
+                var mood = playlistArray[i];
+
+                var musicEmotion= $("#musicEmotion")
+                var linkDiv = $("<div class= 'item card-panel hoverable'>");
+                var allLists = data.playlists.items[i].external_urls.spotify;
+                console.log(allLists)
+                
+                var link = $("<a>").text(data.playlists.items[i].external_urls.spotify);
+                link.attr("href", allLists);
+                link.text("Go to playlist!");
+                link.attr("target", "blank")
+                linkDiv.append(link);
+                musicEmotion.append(linkDiv);
+            }
+    
+        });
     });
 
 
-    delete_photo_btn.addEventListener("click", function(e) {
+    delete_photo_btn.addEventListener("click", function (e) {
 
         e.preventDefault();
 
@@ -144,7 +256,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function displayErrorMessage(error_msg, error) {
         error = error || "";
-        if(error){
+        if (error) {
             console.error(error);
         }
 
@@ -154,15 +266,16 @@ document.addEventListener('DOMContentLoaded', function () {
         error_message.classList.add("visible");
     }
 
-   
+
     function hideUI() {
         // Helper function for clearing the app UI.
 
         controls.classList.remove("visible");
         start_camera.classList.remove("visible");
         video.classList.remove("visible");
-        snap.classList.remove("visible");
+        // snap.classList.remove("visible");
         error_message.classList.remove("visible");
     }
 
 });
+

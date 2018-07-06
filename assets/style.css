@@ -1,6 +1,6 @@
-/* styles go here */
+
 body {
-    background-color:#5e5e5e;
+    background-color:#252222;
 }
 .header {
     background-color: black;
@@ -26,6 +26,9 @@ body {
     width: 170px;
     height: 150px;
 }
+form {
+    background-color:black
+}
 
 .visible{
     width:170px;
@@ -35,5 +38,18 @@ body {
     font-family: Galada,cursive;
     background:#5e5e5e;;
     
+}
+.playlistContainer {
+    background-color: #5e5e5e
+    height:290px;
+    width:285px;
+    float:left;
+    margin:5px;
+    text-align: center
+}
+
+.albumSize{
+    width:150px;
+    height:150px;
 }
 
