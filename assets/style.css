@@ -30,8 +30,9 @@ form {
     background-color:black;
 }
 
-.visible{
+#start-camera {
     width:170px;
+    font-size: 200%;
 }
 
 .musicbar{
@@ -45,3 +46,4 @@ form {
     font-size: 150%;
 
 }
+
