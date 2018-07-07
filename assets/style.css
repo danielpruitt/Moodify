@@ -71,3 +71,7 @@ img[src=""]:empty {
     display: none;
  }
 
+ ::placeholder { 
+        color: gray;
+        opacity: 3;
+}
