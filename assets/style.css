@@ -19,7 +19,8 @@ body {
     height: 100%;
     border-right:1px solid black;
     font-family: Amaranth, cursive;
-    font-size: 70%;
+    font-size: 80%;
+    color: red;
 }
 .hide {
     display:none;
@@ -63,9 +64,7 @@ img{
     height:150px;
 }
 
-#snapshotText {
-    font-size: 150%;
-}
+
 
 img[src=""]:empty {
     display: none;
