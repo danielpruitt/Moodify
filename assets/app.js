@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', function () {
         authDomain: "moodify-3d415.firebaseapp.com",
         databaseURL: "https://moodify-3d415.firebaseio.com",
         projectId: "moodify-3d415",
-        storageBucket: "",
+        storageBucket: "moodify-3d415.appspot.com",
         messagingSenderId: "854313353749"
     };
     firebase.initializeApp(config);
@@ -32,6 +32,57 @@ document.addEventListener('DOMContentLoaded', function () {
         navigator.mozGetUserMedia ||
         navigator.msGetUserMedia
     );
+
+    function takeSnapshot() {
+        // Here we're using a trick that involves a hidden canvas element.  
+
+        var hidden_canvas = document.querySelector('canvas'),
+            context = hidden_canvas.getContext('2d');
+
+        var width = video.videoWidth,
+            height = video.videoHeight;
+
+        if (width && height) {
+
+            // Setup a canvas with the same dimensions as the video.
+            hidden_canvas.width = width;
+            hidden_canvas.height = height;
+
+            // Make a copy of the current frame in the video on the canvas.
+            context.drawImage(video, 0, 0, width, height);
+
+            // Turn the canvas image into a dataURL that can be used as a src for our photo.
+            return hidden_canvas.toDataURL('image/png');
+        }
+    }
+
+
+    function displayErrorMessage(error_msg, error) {
+        error = error || "";
+        if (error) {
+            console.error(error);
+        }
+
+        error_message.innerText = error_msg;
+
+        hideUI();
+        error_message.classList.add("visible");
+    }
+    function showVideo() {
+        hideUI();
+        video.classList.add("visible");
+        controls.classList.add("visible");
+    }
+
+    function hideUI() {
+        // Helper function for clearing the app UI.
+
+        controls.classList.remove("visible");
+        start_camera.classList.remove("visible");
+        video.classList.remove("visible");
+        // snap.classList.remove("visible");
+        error_message.classList.remove("visible");
+    }
 
 
     if (!navigator.getMedia) {
@@ -91,14 +142,6 @@ document.addEventListener('DOMContentLoaded', function () {
         //this is to remove the unnessesary string in the beginnning to pass through API. This gives us the image in base64 string
         var base64Snap = snap.replace("data:image/png;base64,", '');
 
-        var metadata = {
-            contentType: 'image/jpeg',
-        }
-        database.ref().push({
-            base64: base64Snap,
-            file: metadata,
-        });
-
         // Show image. 
         image.setAttribute('src', snap);
         image.classList.add("visible");
@@ -130,6 +173,8 @@ document.addEventListener('DOMContentLoaded', function () {
         }).then(data => {
             //Console logs imgur url of snapshot
             console.log(data.data.link);
+            var imgurUrl = data.data.link;
+            console.log(imgurUrl);
             ///Emotion analysis API
             $.ajax({
                 url: 'https://api.kairos.com/v2/media' + '?source=' + data.data.link,
@@ -142,9 +187,17 @@ document.addEventListener('DOMContentLoaded', function () {
             }).done(function (response) {
                 //console logs array of emotions with values for each: Anger, disgust, fear, joy, sadness, suprise
                 console.log(response.frames[0].people[0].emotions);
-
+                var kairosEmotion = response.frames[0].people[0].emotions;
+                database.ref().push({
+                    emotion:kairosEmotion,
+                    image:imgurUrl,
+                    dateAdded:firebase.database.ServerValue.TIMESTAMP
+                })
+                
+                
             });
         }).catch(err => console.log(err));
+
 
         ////////////////////////////////////////////////////
         // SPOTIFY API goes here 
@@ -193,7 +246,7 @@ var client_id = '2752cb9f8d0940aeb25e5c564dd68a1e';
         }
 
         getArtist(submittedMood, function (data) {
-            console.log(data);
+            // console.log(data);
             var playlistArray = data.playlists.items;
 
             for(var i=0; i < playlistArray.length; i++){
@@ -224,10 +277,11 @@ var client_id = '2752cb9f8d0940aeb25e5c564dd68a1e';
             
             var spotUser = data.playlists.items[i].owner.id;
             var spotPlaylist = data.playlists.items[i].id;
-            console.log("playlist id: " + spotPlaylist);
-            console.log("user id: " + spotUser)
-            var playerLink = "https://open.spotify.com/embed?uri=spotify:user:" + "rebeccatoohey4514" + ":playlist:" + "2HhOFuQcp2FVe9Wdy7SOZQ"
-            console.log ("webplayer link: " + playerLink);
+            // console.log("playlist id: " + spotPlaylist);
+            // console.log("user id: " + spotUser)
+            var playerLink = "https://open.spotify.com/embed?uri=spotify:user:" + spotUser + ":playlist:" + spotPlaylist;
+            // console.log ("webplayer link: " + playerLink);
+            
             $("#iframe").attr("src", playerLink)
 
             musicEmotion.prepend(linkDiv);
@@ -255,60 +309,6 @@ var client_id = '2752cb9f8d0940aeb25e5c564dd68a1e';
     });
 
 
-
-    function takeSnapshot() {
-        // Here we're using a trick that involves a hidden canvas element.  
-
-        var hidden_canvas = document.querySelector('canvas'),
-            context = hidden_canvas.getContext('2d');
-
-        var width = video.videoWidth,
-            height = video.videoHeight;
-
-        if (width && height) {
-
-            // Setup a canvas with the same dimensions as the video.
-            hidden_canvas.width = width;
-            hidden_canvas.height = height;
-
-            // Make a copy of the current frame in the video on the canvas.
-            context.drawImage(video, 0, 0, width, height);
-
-            // Turn the canvas image into a dataURL that can be used as a src for our photo.
-            return hidden_canvas.toDataURL('image/png');
-        }
-    }
-
-
-    function showVideo() {
-        hideUI();
-        video.classList.add("visible");
-        controls.classList.add("visible");
-    }
-
-
-    function displayErrorMessage(error_msg, error) {
-        error = error || "";
-        if (error) {
-            console.error(error);
-        }
-
-        error_message.innerText = error_msg;
-
-        hideUI();
-        error_message.classList.add("visible");
-    }
-
-
-    function hideUI() {
-        // Helper function for clearing the app UI.
-
-        controls.classList.remove("visible");
-        start_camera.classList.remove("visible");
-        video.classList.remove("visible");
-        // snap.classList.remove("visible");
-        error_message.classList.remove("visible");
-    }
 
 
     });
