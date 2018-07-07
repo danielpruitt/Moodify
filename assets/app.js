@@ -10,6 +10,17 @@ document.addEventListener('DOMContentLoaded', function () {
         download_photo_btn = document.querySelector('#download-photo'),
         error_message = document.querySelector('#error-message');
 
+    // Initialize Firebase
+    var config = {
+        apiKey: "AIzaSyBC-kRQPdLCwwTkvWZteE36b8BP212GDSs",
+        authDomain: "my-firebase-project-450cb.firebaseapp.com",
+        databaseURL: "https://my-firebase-project-450cb.firebaseio.com",
+        projectId: "my-firebase-project-450cb",
+        storageBucket: "my-firebase-project-450cb.appspot.com",
+        messagingSenderId: "718926907352"
+    };
+    firebase.initializeApp(config);
+
 
     // The getUserMedia interface is used for handling camera input.
     // Some browsers need a prefix so here we're covering all the options
@@ -77,13 +88,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
         //this is to remove the unnessesary string in the beginnning to pass through API
         var base64Snap = snap.replace("data:image/png;base64,", '');
-        //var base64Snap = "https://image.shutterstock.com/image-photo/portrait-old-man-260nw-169463840.jpg";
-
-        //Kairos app key(API key)
-        var appKey = "f74c4a76f8186a5c54d2afbe34015740";
-
-        //Kairos app ID(*This is also required)
-        var appID = "5989e8db";
 
         // Show image. 
         image.setAttribute('src', snap);
@@ -104,88 +108,111 @@ document.addEventListener('DOMContentLoaded', function () {
         //Try to limit the number of requests when testing, especially when we have multiple people working on this.
         //////////////////////////////////////////////////
 
-        var headers = {
-            "Content-type": "application/json",
-            "app_id": appID,
-            "app_key": appKey
-        };
-
-        var payload = { "image": base64Snap };
-
-        var url = "http://api.kairos.com/detect";
-
-        // Detect API
-        // $.ajax(url, {
-        //     headers: headers,
-        //     type: "POST",
-        //     data: JSON.stringify(payload),
-        //     dataType: "text"
-        // }).done(function (response) {
-        //     console.log(JSON.parse(response).images[0].faces[0]);
-        // });
-
-
-        ///Emotion analysis API
+        ////imgur api
         $.ajax({
-            url: 'https://api.kairos.com/v2/media' + '?source=https://www.dropbox.com/s/zzism6402lfo5sw/happy.jpg?raw=1',
+            url: 'https://api.imgur.com/3/image',
             type: 'POST',
             headers: {
-                "Content-type"    : "application/json",
-                    "app_id"          : '5989e8db',
-                    "app_key"         : 'f74c4a76f8186a5c54d2afbe34015740'
-                  }
-        }).done(function(data, textStatus){
-            console.log(textStatus);
-            console.log(data);
-        });
+                'Authorization': 'Client-ID c98e83d1fb7401a'
+            },
+            data: {
+                image: base64Snap
+            }
+        }).then(data => {
+            //Console logs imgur url of snapshot
+            console.log(data.data.link);
+            ///Emotion analysis API
+            $.ajax({
+                url: 'https://api.kairos.com/v2/media' + '?source='+data.data.link,
+                type: 'POST',
+                headers: {
+                    "Content-type": "application/json",
+                    "app_id": '5989e8db',
+                    "app_key": 'f74c4a76f8186a5c54d2afbe34015740'
+                }
+            }).done(function (response) {
+                console.log(response.frames[0].people[0].emotions);
 
-       
+            });
+        }).catch(err => console.log(err));
+
+        ////////////////////////////////////////////////////
+        // SPOTIFY API gotes here 
+        // var client_id = '2752cb9f8d0940aeb25e5c564dd68a1e';
+        // var client_secret = '07c7345aa3c6424289bb28e7e27b919f';
+        // var access_token;
+
+        // var userMood
+        // $("#submitEmotion").on("click", function (event){
+        //     event.preventDefault();
+        //     var submittedMood = $("#userInputMood").val().trim();
+        //     console.log(submittedMood)
+
+        // function generateAccessToken(cb) {
+        //     $.ajax({
+        //         url: 'https://cors-anywhere.herokuapp.com/https://accounts.spotify.com/api/token',
+        //         method: "POST",
+        //         data: {
+        //             grant_type: "client_credentials"
+        //         },
+        //         headers: {
+        //             Authorization: "Basic " + btoa(client_id + ":" + client_secret)
+        //         }
+        //     }).then(res => {
+        //         access_token = res.access_token;
+        //         cb();
+        //     }).catch(err => console.error(err));
+        // }
+
+        // function getArtist(playlist, cb) {
+        //     $.ajax({
+        //         method: 'GET',
+        //         url: 'https://api.spotify.com/v1/search',
+        //         data: {
+        //             q: playlist,
+        //             type: 'playlist'
+        //         },
+        //         headers: {
+        //             Authorization: "Bearer " + access_token
+        //         }
+        //     }).then(cb).catch(() => generateAccessToken(() => getArtist(playlist, cb)));
+        // }
+
+        // getArtist(submittedMood, function (data) {
+        //     console.log(data);
+        //     var playlistArray = data.playlists.items;
+
+        //     for(var i=0; i < playlistArray.length; i++){
+        //     var mood = playlistArray[i];
+
+        //     var musicEmotion= $("#musicEmotion")
+        //     var linkDiv = $("<div class= 'hoverable card-panel playlistContainer  '>");
+        //     var allLists = data.playlists.items[i].external_urls.spotify;
+
+        //     var img = data.playlists.items[i].images[0].url;
+        //     console.log(img)
+        //     var playArt = $("<img>");
+        //     playArt.addClass("albumSize");
+        //     playArt.attr("src", img);
+
+        //     var playName = data.playlists.items[i].name;
+        //     var playlistTitle = $("<p>").prepend(playName)
+
+        //     var link = $("<a>").text(data.playlists.items[i].external_urls.spotify);
+        //     link.attr("href", allLists);
+        //     link.text("Go to playlist!");
+        //     link.attr("target", "blank")
+        //     linkDiv.append(playlistTitle);
+        //     linkDiv.append(link);
+        //     linkDiv.append(playArt);
+
+        //     musicEmotion.prepend(linkDiv);
+        //     }
+        // });
+
     });
 
-    ////////////////////////////////////////////////////
-    // SPOTIFY API gotes here 
-    // var client_id = '2752cb9f8d0940aeb25e5c564dd68a1e';
-    // var client_secret = '07c7345aa3c6424289bb28e7e27b919f';
-    // var access_token;
 
-    // function generateAccessToken(cb) {
-    //     $.ajax({
-    //         url: 'https://cors-anywhere.herokuapp.com/https://accounts.spotify.com/api/token',
-    //         method: "POST",
-    //         data: {
-    //             grant_type: "client_credentials"
-    //         },
-    //         headers: {
-    //             Authorization: "Basic " + btoa(client_id + ":" + client_secret)
-    //         }
-    //     }).then(res => {
-    //         access_token = res.access_token;
-    //         cb();
-    //     }).catch(err => console.error(err));
-    // }
-
-    // function getArtist(playlist, cb) {
-    //     $.ajax({
-    //         method: 'GET',
-    //         url: 'https://api.spotify.com/v1/search',
-    //         data: {
-    //             q: playlist,
-    //             type: 'playlist'
-    //         },
-    //         headers: {
-    //             Authorization: "Bearer " + access_token
-    //         }
-    //     }).then(cb).catch(() => generateAccessToken(() => getArtist(playlist, cb)));
-    // }
-
-    // getArtist('anger', function (data) {
-    //     console.log(data);
-    //     var mood = data.playlists.items[2]
-    //     console.log(mood)
-    //     // $("#musicEmotion").append(mood)
-    // });
-
-    /////////////////////////////////////////////////
 
     delete_photo_btn.addEventListener("click", function (e) {
 
