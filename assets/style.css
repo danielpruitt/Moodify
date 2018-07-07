@@ -9,25 +9,30 @@ body {
     text-align: center;
     text-shadow: 3px 1px #4db6ac;
 }
+#headerText {
+    font-size: 150%;
 
-.hide {
-    display: none;
 }
-
-
 
 .sidebar{
     background-color: #4db6ac;
-    height: 80%;
+    height: 100%;
     border-right:1px solid black;
     font-family: Amaranth, cursive;
 }
+
+img{
+    width:170px;
+    height:150px;
+}
+.button {
+    background-color:#1B403C;
+    font-family: Amaranth, cursive;
+}
+
 #camera-stream{
     width: 170px;
     height: 150px;
-}
-form {
-    background-color:black;
 }
 
 #start-camera {
@@ -41,9 +46,18 @@ form {
 
     
 }
-
-#headerText {
-    font-size: 150%;
-
+.playlistContainer {
+    width:260px;
+    height:270px;
+    float:left;
+    margin:5px;
+    text-align: center;
+    align-content: center;
 }
+.albumSize{
+    width:150px;
+    height:150px;
+}
+
+
 
