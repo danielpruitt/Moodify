@@ -78,12 +78,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
     });
 
-
     take_photo_btn.addEventListener("click", function (e) {
 
         e.preventDefault();
 
         $("#camera-stream").addClass("hide");
+        $("#loading").removeClass("hide");
 
         //this variable will store the base 64 image source
         var snap = takeSnapshot();
@@ -141,110 +141,116 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             }).done(function (response) {
                 //console logs array of emotions with values for each: Anger, disgust, fear, joy, sadness, suprise
-                console.log(response.frames[0].people[0].emotions);
+                var object = response.frames[0].people[0].emotions;
+                $("#loading").addClass("hide");
+                console.log(object);
 
             });
         }).catch(err => console.log(err));
 
-        ////////////////////////////////////////////////////
-        // SPOTIFY API goes here 
-        // var client_id = '2752cb9f8d0940aeb25e5c564dd68a1e';
-        // var client_secret = '07c7345aa3c6424289bb28e7e27b919f';
-        // var access_token;
-
-        // var userMood
-        // $("#submitEmotion").on("click", function (event){
-        //     event.preventDefault();
-        //     var submittedMood = $("#userInputMood").val().trim();
-        //     console.log(submittedMood)
-
-        // function generateAccessToken(cb) {
-        //     $.ajax({
-        //         url: 'https://cors-anywhere.herokuapp.com/https://accounts.spotify.com/api/token',
-        //         method: "POST",
-        //         data: {
-        //             grant_type: "client_credentials"
-        //         },
-        //         headers: {
-        //             Authorization: "Basic " + btoa(client_id + ":" + client_secret)
-        //         }
-        //     }).then(res => {
-        //         access_token = res.access_token;
-        //         cb();
-        //     }).catch(err => console.error(err));
-        // }
-
-        // function getArtist(playlist, cb) {
-        //     $.ajax({
-        //         method: 'GET',
-        //         url: 'https://api.spotify.com/v1/search',
-        //         data: {
-        //             q: playlist,
-        //             type: 'playlist'
-        //         },
-        //         headers: {
-        //             Authorization: "Bearer " + access_token
-        //         }
-        //     }).then(cb).catch(() => generateAccessToken(() => getArtist(playlist, cb)));
-        // }
-
-        // getArtist(submittedMood, function (data) {
-        //     console.log(data);
-        //     var playlistArray = data.playlists.items;
-
-        //     for(var i=0; i < playlistArray.length; i++){
-        //     var mood = playlistArray[i];
-
-        //     var musicEmotion= $("#musicEmotion")
-        //     var linkDiv = $("<div class= 'hoverable card-panel playlistContainer  '>");
-        //     var allLists = data.playlists.items[i].external_urls.spotify;
-
-        //     var img = data.playlists.items[i].images[0].url;
-        //     console.log(img)
-        //     var playArt = $("<img>");
-        //     playArt.addClass("albumSize");
-        //     playArt.attr("src", img);
-
-        //     var playName = data.playlists.items[i].name;
-        //     var playlistTitle = $("<p>").prepend(playName)
-
-        //     var link = $("<a>").text(data.playlists.items[i].external_urls.spotify);
-        //     link.attr("href", allLists);
-        //     link.text("Go to playlist!");
-        //     link.attr("target", "blank")
-        //     linkDiv.append(playlistTitle);
-        //     linkDiv.append(link);
-        //     linkDiv.append(playArt);
-
-        //     musicEmotion.prepend(linkDiv);
-        //     }
-        // });
-
     });
     /////////END OF TAKE SNAPSHOT CLICK HERE//////////
 
+    ////////////////////////////////////////////////////
+    // SPOTIFY API goes here 
+    var client_id = '2752cb9f8d0940aeb25e5c564dd68a1e';
+    var client_secret = '07c7345aa3c6424289bb28e7e27b919f';
+    var access_token;
+
+    $("#submitEmotion").on("click", function (event) {
+        event.preventDefault();
+        var submittedMood = $("#userInputMood").val().trim();
+        console.log(submittedMood)
+
+        function generateAccessToken(cb) {
+            $.ajax({
+                url: 'https://cors-anywhere.herokuapp.com/https://accounts.spotify.com/api/token',
+                method: "POST",
+                data: {
+                    grant_type: "client_credentials"
+                },
+                headers: {
+                    Authorization: "Basic " + btoa(client_id + ":" + client_secret)
+                }
+            }).then(res => {
+                access_token = res.access_token;
+                cb();
+            }).catch(err => console.error(err));
+        }
+
+        function getArtist(playlist, cb) {
+            $.ajax({
+                method: 'GET',
+                url: 'https://api.spotify.com/v1/search',
+                data: {
+                    q: playlist,
+                    type: 'playlist'
+                },
+                headers: {
+                    Authorization: "Bearer " + access_token
+                }
+            }).then(cb).catch(() => generateAccessToken(() => getArtist(playlist, cb)));
+        }
+
+        getArtist(submittedMood, function (data) {
+            console.log(data);
+            var playlistArray = data.playlists.items;
+
+            for (var i = 0; i < playlistArray.length; i++) {
+                var mood = playlistArray[i];
+
+                var musicEmotion = $("#musicEmotion")
+                var linkDiv = $("<div class= 'hoverable card-panel playlistContainer  '>");
+                var allLists = data.playlists.items[i].external_urls.spotify;
+
+                var img = data.playlists.items[i].images[0].url;
+                console.log(img)
+                var playArt = $("<img>");
+                playArt.addClass("albumSize");
+                playArt.attr("src", img);
+
+                var playName = data.playlists.items[i].name;
+                var playlistTitle = $("<p>").prepend(playName)
+
+                var link = $("<a>").text(data.playlists.items[i].external_urls.spotify);
+                link.attr("href", allLists);
+                link.text("Go to playlist!");
+                link.attr("target", "blank")
+                linkDiv.append(playlistTitle);
+                linkDiv.append(link);
+                linkDiv.append(playArt);
+
+                musicEmotion.prepend(linkDiv);
+            }
+        });
 
 
-    delete_photo_btn.addEventListener("click", function (e) {
 
-        e.preventDefault();
+        delete_photo_btn.addEventListener("click", function (e) {
 
-        // Hide image.
-        image.setAttribute('src', "");
-        image.classList.remove("visible");
+            e.preventDefault();
 
-        // Disable delete and save buttons
-        delete_photo_btn.classList.add("disabled");
-        download_photo_btn.classList.add("disabled");
+            // Hide image.
+            image.setAttribute('src', "");
+            image.classList.remove("visible");
 
-        $("#camera-stream").removeClass("hide");
+            // Disable delete and save buttons
+            delete_photo_btn.classList.add("disabled");
+            download_photo_btn.classList.add("disabled");
 
-        // Resume playback of stream.
-        video.play();
+            $("#camera-stream").removeClass("hide");
+
+            // Resume playback of stream.
+            video.play();
+
+        });
 
     });
-
-
+    function showVideo() {
+        hideUI();
+        video.classList.add("visible");
+        controls.classList.add("visible");
+    }
 
     function takeSnapshot() {
         // Here we're using a trick that involves a hidden canvas element.  
@@ -270,13 +276,6 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
 
-    function showVideo() {
-        hideUI();
-        video.classList.add("visible");
-        controls.classList.add("visible");
-    }
-
-
     function displayErrorMessage(error_msg, error) {
         error = error || "";
         if (error) {
@@ -289,7 +288,6 @@ document.addEventListener('DOMContentLoaded', function () {
         error_message.classList.add("visible");
     }
 
-
     function hideUI() {
         // Helper function for clearing the app UI.
 
@@ -299,7 +297,4 @@ document.addEventListener('DOMContentLoaded', function () {
         // snap.classList.remove("visible");
         error_message.classList.remove("visible");
     }
-
-
 });
-
