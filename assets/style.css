@@ -41,11 +41,14 @@ img{
     width:170px;
     font-size: 200%;
 }
-
+img[src=""]:empty {
+    display: none;
+    }
 .input-field{
     height:125px;
     width:auto;
 }
+
 .musicbar{
     color:#ffffff;
     font-family: Amaranth,cursive;
