@@ -1,24 +1,23 @@
 body {
-    background-color:#4db6ac;
+    background-image:url("images/soundboard.jpg")
 }
-.header {
-    background-color: black;
-    color: white;
-    font-family: Galada, cursive;
-    font-size: 500%;
-    text-align: center;
-    text-shadow: 3px 1px #4db6ac;
+nav{
+    height:150px;
+    background-color: #1f1f1f;
 }
-#headerText {
-    font-size: 150%;
-
+.logo {
+    margin-left: 20px;
 }
-
+h1 {
+    font-family:Amaranth, cursive;
+    margin-right:50px
+}
 .sidebar{
-    background-color: #4db6ac;
-    height: 100%;
-    border-right:1px solid black;
+    background-color: #1f1f1f;
+    margin-top:10px;
+    border:1px solid black;
     font-family: Amaranth, cursive;
+    color:#ffffff
 }
 .hide {
     display:none;
@@ -29,7 +28,7 @@ img{
     height:150px;
 }
 .button {
-    background-color:#1B403C;
+    background-color:#1ECC0F;
     font-family: Amaranth, cursive;
 }
 
@@ -43,17 +42,21 @@ img{
     font-size: 200%;
 }
 
+.input-field{
+    height:125px;
+    width:auto;
+}
 .musicbar{
+    color:#ffffff;
     font-family: Amaranth,cursive;
-    background:#4db6ac;
-
-    
 }
 .playlistContainer {
-    width:260px;
-    height:270px;
+    width:230px;
+    height:290px;
+    background-color:#1f1f1f;
     float:left;
-    margin:5px;
+    padding:5px;
+    margin-right:10px;
     text-align: center;
     align-content: center;
 }

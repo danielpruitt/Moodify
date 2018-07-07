@@ -90,7 +90,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
         //this is to remove the unnessesary string in the beginnning to pass through API
         var base64Snap = snap.replace("data:image/png;base64,", '');
-        
+        var metadata = {
+            contentType: 'image/jpeg',
+        }
+        database.ref().push({
+            base64:base64Snap,
+            file: metadata,
+        }); 
         //var base64Snap = "https://image.shutterstock.com/image-photo/portrait-old-man-260nw-169463840.jpg";
 
         //Kairos app key(API key)
@@ -198,7 +204,7 @@ document.addEventListener('DOMContentLoaded', function () {
             var mood = playlistArray[i];
 
             var musicEmotion= $("#musicEmotion")
-            var linkDiv = $("<div class= 'hoverable card-panel playlistContainer  '>");
+            var linkDiv = $("<div class= 'hoverable card-panel playlistContainer'>");
             var allLists = data.playlists.items[i].external_urls.spotify;
         
             var img = data.playlists.items[i].images[0].url;
