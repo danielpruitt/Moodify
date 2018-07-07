@@ -1,5 +1,18 @@
 document.addEventListener('DOMContentLoaded', function () {
 
+    //Initizializing Firebase from Daniel
+    var config = {
+        apiKey: "AIzaSyBeZWPAnK0TAohDy9esl8V1_VCrcGB5lRM",
+        authDomain: "moodify-3d415.firebaseapp.com",
+        databaseURL: "https://moodify-3d415.firebaseio.com",
+        projectId: "moodify-3d415",
+        storageBucket: "",
+        messagingSenderId: "854313353749"
+    };
+    firebase.initializeApp(config);
+    var database = firebase.database();
+
+
     // References to all the element we will need.
     var video = document.querySelector('#camera-stream'),
         image = document.querySelector('#snap'),
@@ -9,17 +22,6 @@ document.addEventListener('DOMContentLoaded', function () {
         delete_photo_btn = document.querySelector('#delete-photo'),
         download_photo_btn = document.querySelector('#download-photo'),
         error_message = document.querySelector('#error-message');
-
-    // Initialize Firebase
-    var config = {
-        apiKey: "AIzaSyBC-kRQPdLCwwTkvWZteE36b8BP212GDSs",
-        authDomain: "my-firebase-project-450cb.firebaseapp.com",
-        databaseURL: "https://my-firebase-project-450cb.firebaseio.com",
-        projectId: "my-firebase-project-450cb",
-        storageBucket: "my-firebase-project-450cb.appspot.com",
-        messagingSenderId: "718926907352"
-    };
-    firebase.initializeApp(config);
 
 
     // The getUserMedia interface is used for handling camera input.
@@ -86,8 +88,16 @@ document.addEventListener('DOMContentLoaded', function () {
         //this variable will store the base 64 image source
         var snap = takeSnapshot();
 
-        //this is to remove the unnessesary string in the beginnning to pass through API
+        //this is to remove the unnessesary string in the beginnning to pass through API. This gives us the image in base64 string
         var base64Snap = snap.replace("data:image/png;base64,", '');
+
+        var metadata = {
+            contentType: 'image/jpeg',
+        }
+        database.ref().push({
+            base64: base64Snap,
+            file: metadata,
+        });
 
         // Show image. 
         image.setAttribute('src', snap);
@@ -104,11 +114,10 @@ document.addEventListener('DOMContentLoaded', function () {
         video.pause();
 
         ///////////////////////////
-        //PLEASE NOTE: Free API key is limited to 25 transactions/min and capped at 1,500/day.
-        //Try to limit the number of requests when testing, especially when we have multiple people working on this.
+        //API CALLS///
         //////////////////////////////////////////////////
 
-        ////imgur api
+        ////Imgur API used to convert base64 to a usable image url
         $.ajax({
             url: 'https://api.imgur.com/3/image',
             type: 'POST',
@@ -123,7 +132,7 @@ document.addEventListener('DOMContentLoaded', function () {
             console.log(data.data.link);
             ///Emotion analysis API
             $.ajax({
-                url: 'https://api.kairos.com/v2/media' + '?source='+data.data.link,
+                url: 'https://api.kairos.com/v2/media' + '?source=' + data.data.link,
                 type: 'POST',
                 headers: {
                     "Content-type": "application/json",
@@ -131,13 +140,14 @@ document.addEventListener('DOMContentLoaded', function () {
                     "app_key": 'f74c4a76f8186a5c54d2afbe34015740'
                 }
             }).done(function (response) {
+                //console logs array of emotions with values for each: Anger, disgust, fear, joy, sadness, suprise
                 console.log(response.frames[0].people[0].emotions);
 
             });
         }).catch(err => console.log(err));
 
         ////////////////////////////////////////////////////
-        // SPOTIFY API gotes here 
+        // SPOTIFY API goes here 
         // var client_id = '2752cb9f8d0940aeb25e5c564dd68a1e';
         // var client_secret = '07c7345aa3c6424289bb28e7e27b919f';
         // var access_token;
@@ -211,6 +221,7 @@ document.addEventListener('DOMContentLoaded', function () {
         // });
 
     });
+    /////////END OF TAKE SNAPSHOT CLICK HERE//////////
 
 
 
