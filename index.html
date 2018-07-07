@@ -70,7 +70,6 @@
                         <input id="submitEmotion" type="submit" value="Submit" class="btn button">
                     </form>
                 </div>
-
             </div>
 
             <div class="col s11 m9 l10 musicbar">
@@ -80,9 +79,18 @@
 
                     <!-- div that contains loading circle. Not sure where to put this.  -->
                     <div class="loader hide" id="loading"></div>
-                    <div id="musicEmotion"></div>
+                    <div style="display:none;" id="myDiv" class="animate-bottom">
+                        <div id="musicEmotion"></div>
+                        <iframe  width="300" height="300" frameborder="0" allowtransparency="true" allow="encrypted-media" id="iframe"></iframe>
+                    </div>
                 </div>
             </div>
+
+            <div class="col s12 m3 l2 sidebar">
+                
+            </div>
+
+
         </div>
     </div>
 

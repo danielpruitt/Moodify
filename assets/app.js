@@ -150,13 +150,16 @@ document.addEventListener('DOMContentLoaded', function () {
 
     });
     /////////END OF TAKE SNAPSHOT CLICK HERE//////////
+    var client_id = '2752cb9f8d0940aeb25e5c564dd68a1e';
+    var client_secret = '07c7345aa3c6424289bb28e7e27b919f';
+    var access_token;
 
     ////////////////////////////////////////////////////
     // SPOTIFY API goes here 
     var client_id = '2752cb9f8d0940aeb25e5c564dd68a1e';
     var client_secret = '07c7345aa3c6424289bb28e7e27b919f';
     var access_token;
-
+    
     $("#submitEmotion").on("click", function (event) {
         event.preventDefault();
         var submittedMood = $("#userInputMood").val().trim();
@@ -219,33 +222,47 @@ document.addEventListener('DOMContentLoaded', function () {
                 linkDiv.append(playlistTitle);
                 linkDiv.append(link);
                 linkDiv.append(playArt);
+                document.getElementById("myDiv").style.display = "block"
+
+                //adding to the webplayer
+
+                var spotUser = data.playlists.items[i].owner.id;
+                var spotPlaylist = data.playlists.items[i].id;
+                console.log("playlist id: " + spotPlaylist);
+                console.log("user id: " + spotUser)
+                var playerLink = "https://open.spotify.com/embed?uri=spotify:user:" + "rebeccatoohey4514" + ":playlist:" + "2HhOFuQcp2FVe9Wdy7SOZQ"
+                console.log("webplayer link: " + playerLink);
+                $("#iframe").attr("src", playerLink)
 
                 musicEmotion.prepend(linkDiv);
+                
             }
         });
 
+    });
 
 
-        delete_photo_btn.addEventListener("click", function (e) {
 
-            e.preventDefault();
+    delete_photo_btn.addEventListener("click", function (e) {
 
-            // Hide image.
-            image.setAttribute('src', "");
-            image.classList.remove("visible");
+        e.preventDefault();
 
-            // Disable delete and save buttons
-            delete_photo_btn.classList.add("disabled");
-            download_photo_btn.classList.add("disabled");
+        // Hide image.
+        image.setAttribute('src', "");
+        image.classList.remove("visible");
 
-            $("#camera-stream").removeClass("hide");
+        // Disable delete and save buttons
+        delete_photo_btn.classList.add("disabled");
+        download_photo_btn.classList.add("disabled");
 
-            // Resume playback of stream.
-            video.play();
+        $("#camera-stream").removeClass("hide");
 
-        });
+        // Resume playback of stream.
+        video.play();
 
     });
+
+
     function showVideo() {
         hideUI();
         video.classList.add("visible");
