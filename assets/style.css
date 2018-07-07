@@ -20,6 +20,9 @@ body {
     border-right:1px solid black;
     font-family: Amaranth, cursive;
 }
+.hide {
+    display:none;
+}
 
 img{
     width:170px;

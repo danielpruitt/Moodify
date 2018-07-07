@@ -1,5 +1,18 @@
 document.addEventListener('DOMContentLoaded', function () {
 
+    //firebase
+    var config = {
+        apiKey: "AIzaSyBeZWPAnK0TAohDy9esl8V1_VCrcGB5lRM",
+        authDomain: "moodify-3d415.firebaseapp.com",
+        databaseURL: "https://moodify-3d415.firebaseio.com",
+        projectId: "moodify-3d415",
+        storageBucket: "",
+        messagingSenderId: "854313353749"
+    };
+    firebase.initializeApp(config);
+    var database = firebase.database();
+
+
     // References to all the element we will need.
     var video = document.querySelector('#camera-stream'),
         image = document.querySelector('#snap'),
@@ -77,6 +90,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         //this is to remove the unnessesary string in the beginnning to pass through API
         var base64Snap = snap.replace("data:image/png;base64,", '');
+        
         //var base64Snap = "https://image.shutterstock.com/image-photo/portrait-old-man-260nw-169463840.jpg";
 
         //Kairos app key(API key)
@@ -115,6 +129,7 @@ document.addEventListener('DOMContentLoaded', function () {
         };
 
         var payload = { "image": base64Snap };
+       
 
         var url = "http://api.kairos.com/detect";
 
@@ -140,6 +155,10 @@ document.addEventListener('DOMContentLoaded', function () {
             event.preventDefault();
             var submittedMood = $("#userInputMood").val().trim();
             console.log(submittedMood)
+
+            database.ref().push({
+                UserSearchInput: submittedMood
+            })
             
         function generateAccessToken(cb) {
             $.ajax({
