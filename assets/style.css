@@ -7,7 +7,7 @@ body {
     font-family: Galada, cursive;
     font-size: 500%;
     text-align: center;
-    text-shadow: 3px 1px #4db6ac;
+    text-shadow: 4px 1px #4db6ac;
 }
 #headerText {
     font-size: 150%;
@@ -71,7 +71,13 @@ img[src=""]:empty {
     display: none;
  }
 
- ::placeholder { 
+ #yourMusic {
+    text-underline-position: below;
+    text-decoration: underline;
+
+ }
+
+::placeholder { 
         color: gray;
         opacity: 3;
 }
