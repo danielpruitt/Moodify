@@ -7,7 +7,7 @@ body {
     font-family: Galada, cursive;
     font-size: 500%;
     text-align: center;
-    text-shadow: 3px 1px #4db6ac;
+    text-shadow: 4px 1px #4db6ac;
 }
 #headerText {
     font-size: 150%;
@@ -19,6 +19,11 @@ body {
     height: 100%;
     border-right:1px solid black;
     font-family: Amaranth, cursive;
+    font-size: 80%;
+    color: red;
+}
+.hide {
+    display:none;
 }
 
 img{
@@ -61,3 +66,17 @@ img{
 
 
 
+img[src=""]:empty {
+    display: none;
+ }
+
+ #yourMusic {
+    text-underline-position: below;
+    text-decoration: underline;
+
+ }
+
+::placeholder { 
+        color: gray;
+        opacity: 3;
+}

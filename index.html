@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-rc.2/css/materialize.min.css">
     <link rel="stylesheet" href="assets/style.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-rc.2/js/materialize.min.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/5.1.0/firebase.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/5.2.0/firebase.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <title>Moodify</title>
 </head>
@@ -34,9 +34,8 @@
 
                     <!-- This is a click link for mobile browsers to start the video. Video camera on computer browsers start automatically. -->
                     <a href="#" id="start-camera" class="hide-on-med-and-up">Touch here to start the app.</a>
-                    <p class="flow-text"> Take a selfie to check you mood! We'll check to see what kind of music to put it to.</p>
                     <video muted id="camera-stream"></video>
-                    <img id="snap">
+                    <img id="snap" src="">
 
                     <p id="error-message"></p>
 
@@ -62,8 +61,8 @@
 
                 <div>
                     <form class="input-field card-panel hoverable">
-                        <label class="right-align" for="userInputMood"><h5>Your Mood:</h5></label>
-                        <input id="userInputMood" type="text" class="validate">
+            
+                        <input id="userInputMood" type="text" class="validate" placeholder="Your Mood:">
                         <input id="submitEmotion" type="submit" value="Submit" class="btn button">
                     </form>
                 </div>
@@ -71,9 +70,9 @@
             </div>
 
             <div class="col s11 m8 l9 musicbar">
-                <h1>Your Music</h1>
+                <h2>Take a snaphot or type in a mood to get custom playlists!</h1>
                     <div>
-                        <h2>Take a snaphot or type in a mood to get custom playlists!</h2>
+                        <h3 id="yourMusic">Your Music:</h2>
                         <div id="musicEmotion"></div>
                     </div>
             </div>
