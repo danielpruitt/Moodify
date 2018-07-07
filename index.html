@@ -36,10 +36,11 @@
                 <div>
 
                     <!-- This is a click link for mobile browsers to start the video. Video camera on computer browsers start automatically. -->
-                    <a href="#" id="start-camera" class="hide-on-med-and-up">Touch here to start the app.</a>
-                    <p class="flow-text"> Take a selfie to check you mood! We'll check to see what kind of music to put it to.</p>
-                    <video muted id="camera-stream"></video>
-                    <img src ="" id="snap">
+                    <div id="cameraContainer">
+                        <a href="#" id="start-camera" class="hide-on-med-and-up">Touch here to start the app.</a>
+                        <video muted id="camera-stream"></video>
+                        <img src ="" id="snap">
+                    </div>
 
                     <p id="error-message"></p>
 
@@ -64,9 +65,8 @@
                 </div>
 
                 <div>
-                    <form class="input-field card-panel">
-                        <label class="center" for="userInputMood"></label>
-                        <input id="userInputMood" type="text" class="validate">
+                    <form class="input-field card-panel" id="moodInputForm">
+                        <input id="userInputMood" type="text" class="validate" for="userInputMood" placeholder="Your mood:">
                         <input id="submitEmotion" type="submit" value="Submit" class="btn button">
                     </form>
                 </div>
@@ -74,9 +74,9 @@
             </div>
 
             <div class="col s11 m9 l10 musicbar">
-                <h2>Your Music</h2>
+                <h3>Take a snaphot or type in a mood to get custom playlists!</h3>
                     <div>
-                        <h4>Take a snaphot or type in a mood to get custom playlists!</h4>
+                        <h2 id="yourMusic">Your Music</h2>
                         <div id="musicEmotion"></div>
                     </div>
             </div>
