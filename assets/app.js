@@ -250,42 +250,53 @@ var client_id = '2752cb9f8d0940aeb25e5c564dd68a1e';
             var playlistArray = data.playlists.items;
 
             for(var i=0; i < playlistArray.length; i++){
-            var mood = playlistArray[i];
-
-            var musicEmotion= $("#musicEmotion")
-            var linkDiv = $("<div class= 'hoverable card-panel playlistContainer  '>");
-            var allLists = data.playlists.items[i].external_urls.spotify;
-
-            var img = data.playlists.items[i].images[0].url;
-            console.log(img)
-            var playArt = $("<img>");
-            playArt.addClass("albumSize");
-            playArt.attr("src", img);
-
-            var playName = data.playlists.items[i].name;
-            var playlistTitle = $("<p>").prepend(playName)
-
-            var link = $("<a>").text(data.playlists.items[i].external_urls.spotify);
-            link.attr("href", allLists);
-            link.text("Go to playlist!");
-            link.attr("target", "blank")
-            linkDiv.append(playlistTitle);
-            linkDiv.append(link);
-            linkDiv.append(playArt);
-
-            //adding to the webplayer
             
-            var spotUser = data.playlists.items[i].owner.id;
-            var spotPlaylist = data.playlists.items[i].id;
-            // console.log("playlist id: " + spotPlaylist);
-            // console.log("user id: " + spotUser)
-            var playerLink = "https://open.spotify.com/embed?uri=spotify:user:" + spotUser + ":playlist:" + spotPlaylist;
-            // console.log ("webplayer link: " + playerLink);
-            
-            $("#iframe").attr("src", playerLink)
 
-            musicEmotion.prepend(linkDiv);
+                var musicEmotion= $("#musicEmotion")
+                var linkDiv = $("<div class= 'hoverable card-panel playlistContainer  '>");
+                var allLists = data.playlists.items[i].external_urls.spotify;
+
+                var img = data.playlists.items[i].images[0].url;
+                // console.log(img)
+                var playArt = $("<img>");
+                playArt.addClass("albumSize");
+                playArt.attr("src", img);
+
+                var playName = data.playlists.items[i].name;
+                var playlistTitle = $("<p>").prepend(playName);
+
+                var spotUser = data.playlists.items[i].owner.id;
+                console.log(spotUser)
+                var spotPlaylist = data.playlists.items[i].id; 
+                console.log(spotPlaylist)
+                var playerLink = "https://open.spotify.com/embed?uri=spotify:user:" + spotUser + ":playlist:" + spotPlaylist;
+                console.log(playerLink)
+                var webButton = $("<div>");
+                webButton.text("Play Now!");
+                webButton.addClass("btn button");
+                webButton.attr("src", playerLink)
+
+
+                var link = $("<a>").text(data.playlists.items[i].external_urls.spotify);
+                link.attr("href", allLists);
+                link.text("Go to playlist!");
+                link.attr("target", "blank")
+                linkDiv.append(playlistTitle);
+                linkDiv.append(link);
+                linkDiv.append(playArt);
+                linkDiv.append(webButton);
+            
+                //adding to the webplayer
+                $(webButton).on("click", function(){  
+                    console.log(playerLink)
+                    $("#iframe").attr("src", playerLink);
+                    console.log("iframe player link: " + playerLink)
+
+                })
+                
+                musicEmotion.prepend(linkDiv);
             }
+
         });
 
 
