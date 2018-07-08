@@ -234,14 +234,21 @@ document.addEventListener('DOMContentLoaded', function () {
                 //console logs array of emotions with values for each: Anger, disgust, fear, joy, sadness, suprise
                 console.log(response.frames[0].people[0].emotions);
                 var kairosEmotion = response.frames[0].people[0].emotions;
+                
+                var emotionSorted = Object.keys(kairosEmotion).sort(function(a,b){return kairosEmotion[a]-kairosEmotion[b]});
+                console.log(emotionSorted);
+                var maxEmotion = emotionSorted[5];
+                console.log(maxEmotion);
+                $("#photoMood").text("You current mood is " + maxEmotion);
                 database.ref().push({
                     emotion: kairosEmotion,
                     image: imgurUrl,
+                    MaxEmotion: maxEmotion,
                     dateAdded: firebase.database.ServerValue.TIMESTAMP
-                })
-
+                });
             });
         }).catch(err => console.log(err));
+
         // Enable delete and save buttons
         delete_photo_btn.classList.remove("disabled");
         download_photo_btn.classList.remove("disabled");
@@ -262,7 +269,9 @@ document.addEventListener('DOMContentLoaded', function () {
         event.preventDefault();
         var submittedMood = $("#userInputMood").val().trim();
         console.log(submittedMood);
+        
 
+        $("#exportedMood").text("Your " + submittedMood + " playlists are here! ");
         function generateAccessToken(cb) {
             $.ajax({
                 url: 'https://cors-anywhere.herokuapp.com/https://accounts.spotify.com/api/token',
@@ -309,13 +318,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 var img = data.playlists.items[i].images[0].url;
 
                 var playArt = $("<img>");
-                // playArt.addClass("albumSize");
                 playArt.attr("src", img);
 
                 var playName = data.playlists.items[i].name;
                 var playlistTitle = $("<a>").prepend(playName);
 
                 playlistTitle.attr("href", allLists);
+                playlistTitle.attr("target", "blank");
 
                 // link.attr("href", allLists);
                 // link.text("Go to playlist!");
@@ -332,11 +341,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 var spotUser = data.playlists.items[i].owner.id;
                 var spotPlaylist = data.playlists.items[i].id;
-                // console.log("playlist id: " + spotPlaylist);
-                // console.log("user id: " + spotUser);
-                var playerLink = "https://open.spotify.com/embed?uri=spotify:user:" + "rebeccatoohey4514" + ":playlist:" + "2HhOFuQcp2FVe9Wdy7SOZQ"
-                // console.log("webplayer link: " + playerLink);
-                $("#iframe").attr("src", playerLink);
+                console.log("playlist id: " + spotPlaylist);
+                console.log("user id: " + spotUser);
+                
+                var playerLink = "https://open.spotify.com/embed?uri=spotify:user:" + spotUser + ":playlist:" + spotPlaylist;
+                var iframeSrc = "https://open.spotify.com/embed?uri=spotify:user:" + data.playlists.items[i].owner.id + ":playlist:" + data.playlists.items[i].id;
+                console.log("webplayer link: " + iframeSrc);
+
+
+                $("#iframe").attr("src", iframeSrc);
                 $("#userInputMood").val('');
 
                 musicEmotion.append(linkDiv);
@@ -346,6 +359,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 });
 
             }
+
         });
 
     });

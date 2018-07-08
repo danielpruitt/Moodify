@@ -46,14 +46,14 @@ img#snap.visible,
     display: flex;
 } */
 
-  .pin-top {
+.pin-top {
     position: relative;
-  }
+}
 
 
-  .pin-bottom {
+.pin-bottom {
     position: relative;
-  }
+}
 /* Class for when element is pinned */
 .pinned {
     position: fixed;
@@ -75,7 +75,7 @@ h1 {
 }
 .sidebar{
     background-color: #1f1f1f;
-    margin-top:10px;
+    margin-top:35px;
     border:1px solid black;
     font-family: Amaranth, cursive;
     color:#ffffff;
@@ -127,6 +127,9 @@ img[src=""]:empty {
     width:150px;
     height:150px;
 }
+#loadedplayer{
+    
+}
 
 /* Styling for loading animation */
 .loader {
@@ -144,25 +147,24 @@ img[src=""]:empty {
     height: 120px;
     -webkit-animation: spin 2s linear infinite; /* Safari */
     animation: spin 2s linear infinite;
-  }
+}
 
- 
-  
+
   /* Safari */
-  @-webkit-keyframes spin {
+@-webkit-keyframes spin {
     0% { -webkit-transform: rotate(0deg); }
     100% { -webkit-transform: rotate(360deg); }
-  }
-  
-  @keyframes spin {
+}
+
+@keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
-  }
+}
 
 iframe{
     margin-top: 250px;
 }
-  
+
 /* Animation for page loaded */
 .animate-bottom {
     position: relative;
@@ -170,15 +172,15 @@ iframe{
     -webkit-animation-duration: 1s;
     animation-name: animatebottom;
     animation-duration: 1s
-  }
-  
-  @-webkit-keyframes animatebottom {
+}
+
+@-webkit-keyframes animatebottom {
     from { bottom:-100px; opacity:0 } 
     to { bottom:0px; opacity:1 }
-  }
-  
-  @keyframes animatebottom { 
+}
+
+@keyframes animatebottom { 
     from{ bottom:-100px; opacity:0 } 
     to{ bottom:0; opacity:1 }
-  }
+}
 

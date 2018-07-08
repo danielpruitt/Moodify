@@ -31,13 +31,14 @@
     <div class="">
 
         <div class="row">
+
             <div class="col s12 s3 l2 sidebar animate-bottom">
 
                 <div>
-
+                    
                     <!-- This is a click link for mobile browsers to start the video. Video camera on computer browsers start automatically. -->
                     <a href="#" id="start-camera" class="hide-on-med-and-up">Touch here to start the app.</a>
-                    <p class="flow-text"> Take a selfie to check you mood! We'll check to see what kind of music to put it to.</p>
+                    <p class="flow-text"> Take a selfie to check your mood!</p>
                     <video muted id="camera-stream"></video>
                     <p id="error-message"></p>
 
@@ -52,6 +53,7 @@
                         <a href="#" id="delete-photo" title="Delete Photo" class="disabled ">
                             <i class="btn button">Delete</i>
                         </a>
+                        <p id="photoMood"></p>
                     </div>
 
                     <!-- Hidden canvas element. Used for taking snapshot of video. -->
@@ -71,21 +73,20 @@
             </div>
 
             <div class="col s11 m9 l7 musicbar">
-                <h2 class="animate-bottom">Your Music</h2>
                 <div>
-                    <h4 class="animate-bottom">Take a snaphot or type in a mood to get custom playlists!</h4>
+                    <h4 class="animate-bottom"></h4>
 
                     <!-- div that contains loading circle. Not sure where to put this.  -->
                     <div class="loader hide" id="loading"></div>
                     <div style="display:none;" id="myDiv" class="animate-bottom playlistContainer">
-                        <h2>**Insert mood message here**</h2>
+                        <h2 id="exportedMood"></h2>
                         <div id="musicEmotion" class="carousel"></div>
                     </div>
                 </div>
             </div>
 
             <div class="col s10 m1 l3 animate-bottom" id="loadedPlayer" style="display:none">
-                <iframe width="340" height="450" frameborder="0" allowtransparency="true" allow="encrypted-media" id="iframe"></iframe>
+                <iframe width="340" height="450"  frameborder="0" allowtransparency="true" allow="encrypted-media" id="iframe"></iframe>
             </div>
 
 
