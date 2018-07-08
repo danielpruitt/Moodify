@@ -115,14 +115,14 @@ img[src=""]:empty {
     color:#ffffff;
     font-family: Amaranth,cursive;
 }
-/* .playlistContainer {
+.playlistContainer {
     
     background-color:#1f1f1f;
     
     text-align: center;
     align-content: center;
     border-radius: 25px;
-} */
+}
 .albumSize{
     width:150px;
     height:150px;

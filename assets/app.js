@@ -1,5 +1,3 @@
-
-
 document.addEventListener('DOMContentLoaded', function () {
 
     //Initizializing Firebase from Daniel
@@ -38,6 +36,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     if (!navigator.getMedia) {
         displayErrorMessage("Your browser doesn't have support for the navigator.getUserMedia interface.");
+        
     }
     else {
         // Request the camera.
@@ -62,6 +61,7 @@ document.addEventListener('DOMContentLoaded', function () {
             // Error Callback
             function (err) {
                 displayErrorMessage("There was an error with accessing the camera stream: " + err.name, err);
+                take_photo_btn.classList.add("disabled");
             }
         );
     }
@@ -203,13 +203,10 @@ document.addEventListener('DOMContentLoaded', function () {
             var playlistArray = data.playlists.items;
 
             for (var i = 0; i < playlistArray.length; i++) {
-                var mood = playlistArray[i];
 
                 var musicEmotion = $("#musicEmotion");
 
-                var link = data.playlists.items[i].external_urls.spotify;
-
-                var linkDiv = $("<a class='carousel-item' href='"+link+"'>");
+                var linkDiv = $("<div class='carousel-item'>");
                 var allLists = data.playlists.items[i].external_urls.spotify;
 
                 var img = data.playlists.items[i].images[0].url;
@@ -218,14 +215,15 @@ document.addEventListener('DOMContentLoaded', function () {
                 // playArt.addClass("albumSize");
                 playArt.attr("src", img);
 
-                // var playName = data.playlists.items[i].name;
-                // var playlistTitle = $("<p>").prepend(playName);
+                var playName = data.playlists.items[i].name;
+                var playlistTitle = $("<a>").prepend(playName);
 
-                
+                playlistTitle.attr("href", allLists);
+
                 // link.attr("href", allLists);
                 // link.text("Go to playlist!");
                 // link.attr("target", "blank");
-                // linkDiv.append(playlistTitle);
+                linkDiv.append(playlistTitle);
                 // linkDiv.append(link);
                 linkDiv.append(playArt);
 
@@ -245,7 +243,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 $("#userInputMood").val('');
 
                 musicEmotion.append(linkDiv);
-                
+
                 $("#musicEmotion").ready(function(){
                     $('.carousel').carousel(); //carousel init
                 });
@@ -268,6 +266,7 @@ document.addEventListener('DOMContentLoaded', function () {
         // Disable delete and save buttons
         delete_photo_btn.classList.add("disabled");
         download_photo_btn.classList.add("disabled");
+        take_photo_btn.classList.remove("disabled");
 
         $("#camera-stream").removeClass("hide");
 
@@ -288,6 +287,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         var hidden_canvas = document.querySelector('canvas'),
             context = hidden_canvas.getContext('2d');
+            take_photo_btn.classList.add("disabled");
 
         var width = video.videoWidth,
             height = video.videoHeight;
