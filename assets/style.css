@@ -1,3 +1,64 @@
+.controls a{
+    border-radius: 50%;
+    color: #fff;
+    text-decoration: none;
+    padding: 15px;
+    line-height: 0;
+    outline: none;
+}
+
+.controls a:hover{
+    opacity: 1;
+}
+
+.controls a.disabled{
+    opacity: 0.5;
+    cursor: default;
+    pointer-events: none;
+}
+
+.controls a.disabled:hover{
+    opacity: 0.5;
+}
+
+.controls a i{
+    font-size: 18px;
+    background-color: #1ECC0F;
+    font-family:Amaranth, cursive;
+}
+
+.controls #take-photo i{
+    font-size: 12px;
+}
+
+canvas{
+    display: none;
+}
+
+/* video#camera-stream.visible,
+img#snap.visible,
+#error-message.visible
+{
+    display: block;
+}
+
+.controls.visible{
+    display: flex;
+} */
+
+  .pin-top {
+    position: relative;
+  }
+
+
+  .pin-bottom {
+    position: relative;
+  }
+/* Class for when element is pinned */
+.pinned {
+    position: fixed;
+}
+
 body {
     background-image:url("images/soundboard.jpg")
 }
@@ -17,7 +78,8 @@ h1 {
     margin-top:10px;
     border:1px solid black;
     font-family: Amaranth, cursive;
-    color:#ffffff
+    color:#ffffff;
+    border-radius: 25px; 
 }
 .hide {
     display:none;
@@ -27,7 +89,7 @@ img{
     width:170px;
     height:150px;
 }
-.button {
+.submitButton {
     background-color:#1ECC0F;
     font-family: Amaranth, cursive;
 }
@@ -54,19 +116,69 @@ img[src=""]:empty {
     font-family: Amaranth,cursive;
 }
 .playlistContainer {
-    width:230px;
-    height:290px;
+    
     background-color:#1f1f1f;
-    float:left;
-    padding:5px;
-    margin-right:10px;
+    
     text-align: center;
     align-content: center;
+    border-radius: 25px;
 }
 .albumSize{
     width:150px;
     height:150px;
 }
 
+/* Styling for loading animation */
+.loader {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    z-index: 1;
+    width: 150px;
+    height: 150px;
+    margin: -75px 0 0 -75px;
+    border: 16px solid #f3f3f3;
+    border-radius: 50%;
+    border-top: 16px solid #1ECC0F;
+    width: 120px;
+    height: 120px;
+    -webkit-animation: spin 2s linear infinite; /* Safari */
+    animation: spin 2s linear infinite;
+  }
 
+ 
+  
+  /* Safari */
+  @-webkit-keyframes spin {
+    0% { -webkit-transform: rotate(0deg); }
+    100% { -webkit-transform: rotate(360deg); }
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+iframe{
+    margin-top: 250px;
+}
+  
+/* Animation for page loaded */
+.animate-bottom {
+    position: relative;
+    -webkit-animation-name: animatebottom;
+    -webkit-animation-duration: 1s;
+    animation-name: animatebottom;
+    animation-duration: 1s
+  }
+  
+  @-webkit-keyframes animatebottom {
+    from { bottom:-100px; opacity:0 } 
+    to { bottom:0px; opacity:1 }
+  }
+  
+  @keyframes animatebottom { 
+    from{ bottom:-100px; opacity:0 } 
+    to{ bottom:0; opacity:1 }
+  }
 

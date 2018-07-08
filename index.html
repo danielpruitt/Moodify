@@ -11,9 +11,9 @@
     <link href="https://fonts.googleapis.com/css?family=Amaranth" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-rc.2/css/materialize.min.css">
     <link rel="stylesheet" href="assets/style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-rc.2/js/materialize.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/5.2.0/firebase.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/5.2.0/firebase.js"></script>
     <title>Moodify</title>
 </head>
@@ -31,7 +31,7 @@
     <div class="">
 
         <div class="row">
-            <div class="col s12 m3 l2 sidebar">
+            <div class="col s12 s3 l2 sidebar animate-bottom">
 
                 <div>
 
@@ -39,14 +39,12 @@
                     <a href="#" id="start-camera" class="hide-on-med-and-up">Touch here to start the app.</a>
                     <p class="flow-text"> Take a selfie to check you mood! We'll check to see what kind of music to put it to.</p>
                     <video muted id="camera-stream"></video>
-                    <img src="" id="snap">
-
                     <p id="error-message"></p>
 
                     <!-- Links with click functions -->
                     <div class="controls">
                         <a href="#" id="take-photo" title="Take Photo">
-                            <i class="btn button">TakeScreenshot</i>
+                            <i class="btn button">Take Screenshot</i>
                         </a>
                         <a href="#" id="download-photo" download="selfie.png" title="Save Photo" class="disabled">
                             <i class="btn button">Download</i>
@@ -67,21 +65,30 @@
                     <form class="input-field card-panel">
                         <label class="center" for="userInputMood"></label>
                         <input id="userInputMood" type="text" class="validate">
-                        <input id="submitEmotion" type="submit" value="Submit" class="btn button">
+                        <input id="submitEmotion" type="submit" value="Submit" class="btn button submitButton">
                     </form>
                 </div>
-
             </div>
 
-            <div class="col s11 m9 l10 musicbar">
-                <h2>Your Music</h2>
+            <div class="col s11 m9 l7 musicbar">
+                <h2 class="animate-bottom">Your Music</h2>
                 <div>
-                    <h4>Take a snaphot or type in a mood to get custom playlists!</h4>
-                    <div id="musicEmotion"></div>
+                    <h4 class="animate-bottom">Take a snaphot or type in a mood to get custom playlists!</h4>
 
-                    <iframe  width="300" height="380" frameborder="0" allowtransparency="true" allow="encrypted-media" id="iframe"></iframe>
+                    <!-- div that contains loading circle. Not sure where to put this.  -->
+                    <div class="loader hide" id="loading"></div>
+                    <div style="display:none;" id="myDiv" class="animate-bottom playlistContainer">
+                        <h2>**Insert mood message here**</h2>
+                        <div id="musicEmotion" class="carousel"></div>
+                    </div>
                 </div>
             </div>
+
+            <div class="col s10 m1 l3 animate-bottom" id="loadedPlayer" style="display:none">
+                <iframe width="340" height="450" frameborder="0" allowtransparency="true" allow="encrypted-media" id="iframe"></iframe>
+            </div>
+
+
         </div>
     </div>
 
