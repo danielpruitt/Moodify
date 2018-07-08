@@ -1,3 +1,5 @@
+
+
 document.addEventListener('DOMContentLoaded', function () {
 
     //Initizializing Firebase from Daniel
@@ -103,10 +105,6 @@ document.addEventListener('DOMContentLoaded', function () {
         image.setAttribute('src', snap);
         image.classList.add("visible");
 
-        // Enable delete and save buttons
-        delete_photo_btn.classList.remove("disabled");
-        download_photo_btn.classList.remove("disabled");
-
         // Set the href attribute of the download button to the snap url.
         download_photo_btn.href = snap;
 
@@ -148,6 +146,10 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         }).catch(err => console.log(err));
 
+        // Enable delete and save buttons
+        delete_photo_btn.classList.remove("disabled");
+        download_photo_btn.classList.remove("disabled");
+
     });
     /////////END OF TAKE SNAPSHOT CLICK HERE//////////
     var client_id = '2752cb9f8d0940aeb25e5c564dd68a1e';
@@ -159,11 +161,11 @@ document.addEventListener('DOMContentLoaded', function () {
     var client_id = '2752cb9f8d0940aeb25e5c564dd68a1e';
     var client_secret = '07c7345aa3c6424289bb28e7e27b919f';
     var access_token;
-    
+
     $("#submitEmotion").on("click", function (event) {
         event.preventDefault();
         var submittedMood = $("#userInputMood").val().trim();
-        console.log(submittedMood)
+        console.log(submittedMood);
 
         function generateAccessToken(cb) {
             $.ajax({
@@ -179,7 +181,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 access_token = res.access_token;
                 cb();
             }).catch(err => console.error(err));
-        }
+        };
 
         function getArtist(playlist, cb) {
             $.ajax({
@@ -193,8 +195,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     Authorization: "Bearer " + access_token
                 }
             }).then(cb).catch(() => generateAccessToken(() => getArtist(playlist, cb)));
-        }
+        };
 
+        
         getArtist(submittedMood, function (data) {
             console.log(data);
             var playlistArray = data.playlists.items;
@@ -202,40 +205,51 @@ document.addEventListener('DOMContentLoaded', function () {
             for (var i = 0; i < playlistArray.length; i++) {
                 var mood = playlistArray[i];
 
-                var musicEmotion = $("#musicEmotion")
-                var linkDiv = $("<div class= 'hoverable card-panel playlistContainer  '>");
+                var musicEmotion = $("#musicEmotion");
+
+                var link = data.playlists.items[i].external_urls.spotify;
+
+                var linkDiv = $("<a class='carousel-item' href='"+link+"'>");
                 var allLists = data.playlists.items[i].external_urls.spotify;
 
                 var img = data.playlists.items[i].images[0].url;
-                console.log(img)
+                console.log(img);
                 var playArt = $("<img>");
-                playArt.addClass("albumSize");
+                // playArt.addClass("albumSize");
                 playArt.attr("src", img);
 
-                var playName = data.playlists.items[i].name;
-                var playlistTitle = $("<p>").prepend(playName)
+                // var playName = data.playlists.items[i].name;
+                // var playlistTitle = $("<p>").prepend(playName);
 
-                var link = $("<a>").text(data.playlists.items[i].external_urls.spotify);
-                link.attr("href", allLists);
-                link.text("Go to playlist!");
-                link.attr("target", "blank")
-                linkDiv.append(playlistTitle);
-                linkDiv.append(link);
+                
+                // link.attr("href", allLists);
+                // link.text("Go to playlist!");
+                // link.attr("target", "blank");
+                // linkDiv.append(playlistTitle);
+                // linkDiv.append(link);
                 linkDiv.append(playArt);
-                document.getElementById("myDiv").style.display = "block"
+
+                //adding the page animation when loaded
+                document.getElementById("myDiv").style.display = "block";
+                document.getElementById("loadedPlayer").style.display = "block";
 
                 //adding to the webplayer
 
                 var spotUser = data.playlists.items[i].owner.id;
                 var spotPlaylist = data.playlists.items[i].id;
                 console.log("playlist id: " + spotPlaylist);
-                console.log("user id: " + spotUser)
+                console.log("user id: " + spotUser);
                 var playerLink = "https://open.spotify.com/embed?uri=spotify:user:" + "rebeccatoohey4514" + ":playlist:" + "2HhOFuQcp2FVe9Wdy7SOZQ"
                 console.log("webplayer link: " + playerLink);
-                $("#iframe").attr("src", playerLink)
+                $("#iframe").attr("src", playerLink);
+                $("#userInputMood").val('');
 
-                musicEmotion.prepend(linkDiv);
+                musicEmotion.append(linkDiv);
                 
+                $("#musicEmotion").ready(function(){
+                    $('.carousel').carousel(); //carousel init
+                });
+
             }
         });
 
@@ -314,4 +328,6 @@ document.addEventListener('DOMContentLoaded', function () {
         // snap.classList.remove("visible");
         error_message.classList.remove("visible");
     }
+
+
 });
