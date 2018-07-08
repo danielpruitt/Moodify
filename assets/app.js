@@ -239,6 +239,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 console.log(emotionSorted);
                 var maxEmotion = emotionSorted[5];
                 console.log(maxEmotion);
+                $("#photoMood").text("You current mood is " + maxEmotion);
                 database.ref().push({
                     emotion: kairosEmotion,
                     image: imgurUrl,
@@ -257,7 +258,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     });
     /////////END OF TAKE SNAPSHOT CLICK HERE//////////
-    
+
     ////////////////////////////////////////////////////
     // SPOTIFY API goes here 
     var client_id = '2752cb9f8d0940aeb25e5c564dd68a1e';
