@@ -56,6 +56,59 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
+    function showVideo() {
+        hideUI();
+        video.classList.add("visible");
+        controls.classList.add("visible");
+    }
+
+    function takeSnapshot() {
+        // Here we're using a trick that involves a hidden canvas element.  
+
+        var hidden_canvas = document.querySelector('canvas'),
+            context = hidden_canvas.getContext('2d');
+        take_photo_btn.classList.add("disabled");
+
+        var width = video.videoWidth,
+            height = video.videoHeight;
+
+        if (width && height) {
+
+            // Setup a canvas with the same dimensions as the video.
+            hidden_canvas.width = width;
+            hidden_canvas.height = height;
+
+            // Make a copy of the current frame in the video on the canvas.
+            context.drawImage(video, 0, 0, width, height);
+
+            // Turn the canvas image into a dataURL that can be used as a src for our photo.
+            return hidden_canvas.toDataURL('image/png');
+        }
+    }
+
+
+    function displayErrorMessage(error_msg, error) {
+        error = error || "";
+        if (error) {
+            console.error(error);
+        }
+
+        error_message.innerText = error_msg;
+
+        hideUI();
+        error_message.classList.add("visible");
+    }
+
+    function hideUI() {
+        // Helper function for clearing the app UI.
+
+        controls.classList.remove("visible");
+        start_camera.classList.remove("visible");
+        video.classList.remove("visible");
+        // snap.classList.remove("visible");
+        error_message.classList.remove("visible");
+    }
+
 
     function displayErrorMessage(error_msg, error) {
         error = error || "";
@@ -87,6 +140,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     if (!navigator.getMedia) {
         displayErrorMessage("Your browser doesn't have support for the navigator.getUserMedia interface.");
+
     }
     else {
         // Request the camera.
@@ -111,6 +165,7 @@ document.addEventListener('DOMContentLoaded', function () {
             // Error Callback
             function (err) {
                 displayErrorMessage("There was an error with accessing the camera stream: " + err.name, err);
+                take_photo_btn.classList.add("disabled");
             }
         );
     }
@@ -129,26 +184,17 @@ document.addEventListener('DOMContentLoaded', function () {
 
     });
 
-
     take_photo_btn.addEventListener("click", function (e) {
 
         e.preventDefault();
 
-        $("#camera-stream").addClass("hide");
+        $("#loading").removeClass("hide");
 
         //this variable will store the base 64 image source
         var snap = takeSnapshot();
 
         //this is to remove the unnessesary string in the beginnning to pass through API. This gives us the image in base64 string
         var base64Snap = snap.replace("data:image/png;base64,", '');
-
-        // Show image. 
-        image.setAttribute('src', snap);
-        image.classList.add("visible");
-
-        // Enable delete and save buttons
-        delete_photo_btn.classList.remove("disabled");
-        download_photo_btn.classList.remove("disabled");
 
         // Set the href attribute of the download button to the snap url.
         download_photo_btn.href = snap;
@@ -188,33 +234,43 @@ document.addEventListener('DOMContentLoaded', function () {
                 //console logs array of emotions with values for each: Anger, disgust, fear, joy, sadness, suprise
                 console.log(response.frames[0].people[0].emotions);
                 var kairosEmotion = response.frames[0].people[0].emotions;
+                
+                var emotionSorted = Object.keys(kairosEmotion).sort(function(a,b){return kairosEmotion[a]-kairosEmotion[b]});
+                console.log(emotionSorted);
+                var maxEmotion = emotionSorted[5];
+                console.log(maxEmotion);
                 database.ref().push({
-                    emotion:kairosEmotion,
-                    image:imgurUrl,
-                    dateAdded:firebase.database.ServerValue.TIMESTAMP
-                })
-                
-                
+                    emotion: kairosEmotion,
+                    image: imgurUrl,
+                    MaxEmotion: maxEmotion,
+                    dateAdded: firebase.database.ServerValue.TIMESTAMP
+                });
             });
         }).catch(err => console.log(err));
 
+        // Enable delete and save buttons
+        delete_photo_btn.classList.remove("disabled");
+        download_photo_btn.classList.remove("disabled");
 
         ////////////////////////////////////////////////////
         // SPOTIFY API goes here 
-        
 
     });
     /////////END OF TAKE SNAPSHOT CLICK HERE//////////
-var client_id = '2752cb9f8d0940aeb25e5c564dd68a1e';
-        var client_secret = '07c7345aa3c6424289bb28e7e27b919f';
-        var access_token;
+    
+    ////////////////////////////////////////////////////
+    // SPOTIFY API goes here 
+    var client_id = '2752cb9f8d0940aeb25e5c564dd68a1e';
+    var client_secret = '07c7345aa3c6424289bb28e7e27b919f';
+    var access_token;
 
-        var userMood;
-        $("#submitEmotion").on("click", function (event){
-            event.preventDefault();
-            var submittedMood = $("#userInputMood").val().trim();
-            console.log(submittedMood)
+    $("#submitEmotion").on("click", function (event) {
+        event.preventDefault();
+        var submittedMood = $("#userInputMood").val().trim();
+        console.log(submittedMood);
+        
 
+        $("#exportedMood").text("Your " + submittedMood + " playlists are here! ");
         function generateAccessToken(cb) {
             $.ajax({
                 url: 'https://cors-anywhere.herokuapp.com/https://accounts.spotify.com/api/token',
@@ -229,7 +285,7 @@ var client_id = '2752cb9f8d0940aeb25e5c564dd68a1e';
                 access_token = res.access_token;
                 cb();
             }).catch(err => console.error(err));
-        }
+        };
 
         function getArtist(playlist, cb) {
             $.ajax({
@@ -243,61 +299,69 @@ var client_id = '2752cb9f8d0940aeb25e5c564dd68a1e';
                     Authorization: "Bearer " + access_token
                 }
             }).then(cb).catch(() => generateAccessToken(() => getArtist(playlist, cb)));
-        }
+        };
+
 
         getArtist(submittedMood, function (data) {
-            // console.log(data);
             var playlistArray = data.playlists.items;
 
-            for(var i=0; i < playlistArray.length; i++){
-            
+            $("#musicEmotion").empty();
 
-                var musicEmotion= $("#musicEmotion")
-                var linkDiv = $("<div class= 'hoverable card-panel playlistContainer  '>");
+            for (var i = 0; i < playlistArray.length; i++) {
+
+                var musicEmotion = $("#musicEmotion");
+
+                var linkDiv = $("<div class='carousel-item'>");
                 var allLists = data.playlists.items[i].external_urls.spotify;
 
                 var img = data.playlists.items[i].images[0].url;
-                // console.log(img)
+
                 var playArt = $("<img>");
-                playArt.addClass("albumSize");
                 playArt.attr("src", img);
 
                 var playName = data.playlists.items[i].name;
-                var playlistTitle = $("<p>").prepend(playName);
+                var playlistTitle = $("<a>").prepend(playName);
+
+                playlistTitle.attr("href", allLists);
+                playlistTitle.attr("target", "blank");
+
+                // link.attr("href", allLists);
+                // link.text("Go to playlist!");
+                // link.attr("target", "blank");
+                linkDiv.append(playlistTitle);
+                // linkDiv.append(link);
+                linkDiv.append(playArt);
+
+                //adding the page animation when loaded
+                document.getElementById("myDiv").style.display = "block";
+                document.getElementById("loadedPlayer").style.display = "block";
+
+                //adding to the webplayer
 
                 var spotUser = data.playlists.items[i].owner.id;
-                console.log(spotUser)
-                var spotPlaylist = data.playlists.items[i].id; 
-                console.log(spotPlaylist)
-                var playerLink = "https://open.spotify.com/embed?uri=spotify:user:" + spotUser + ":playlist:" + spotPlaylist;
-                console.log(playerLink)
-                var webButton = $("<div>");
-                webButton.text("Play Now!");
-                webButton.addClass("btn button");
-                webButton.attr("src", playerLink)
-
-
-                var link = $("<a>").text(data.playlists.items[i].external_urls.spotify);
-                link.attr("href", allLists);
-                link.text("Go to playlist!");
-                link.attr("target", "blank")
-                linkDiv.append(playlistTitle);
-                linkDiv.append(link);
-                linkDiv.append(playArt);
-                linkDiv.append(webButton);
-            
-                //adding to the webplayer
-                $(webButton).on("click", function(){  
-                    console.log(playerLink)
-                    $("#iframe").attr("src", playerLink);
-                    console.log("iframe player link: " + playerLink)
-
-                })
+                var spotPlaylist = data.playlists.items[i].id;
+                console.log("playlist id: " + spotPlaylist);
+                console.log("user id: " + spotUser);
                 
-                musicEmotion.prepend(linkDiv);
+                var playerLink = "https://open.spotify.com/embed?uri=spotify:user:" + spotUser + ":playlist:" + spotPlaylist;
+                var iframeSrc = "https://open.spotify.com/embed?uri=spotify:user:" + data.playlists.items[i].owner.id + ":playlist:" + data.playlists.items[i].id;
+                console.log("webplayer link: " + iframeSrc);
+
+
+                $("#iframe").attr("src", iframeSrc);
+                $("#userInputMood").val('');
+
+                musicEmotion.append(linkDiv);
+
+                $("#musicEmotion").ready(function () {
+                    $('.carousel').carousel(); //carousel init
+                });
+
             }
 
         });
+
+    });
 
 
     delete_photo_btn.addEventListener("click", function (e) {
@@ -311,6 +375,7 @@ var client_id = '2752cb9f8d0940aeb25e5c564dd68a1e';
         // Disable delete and save buttons
         delete_photo_btn.classList.add("disabled");
         download_photo_btn.classList.add("disabled");
+        take_photo_btn.classList.remove("disabled");
 
         $("#camera-stream").removeClass("hide");
 
@@ -319,8 +384,4 @@ var client_id = '2752cb9f8d0940aeb25e5c564dd68a1e';
 
     });
 
-
-
-
-    });
 });
