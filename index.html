@@ -12,7 +12,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-rc.2/css/materialize.min.css">
     <link rel="stylesheet" href="assets/style.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-rc.2/js/materialize.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/5.2.0/firebase.js"></script>
     <script src="https://www.gstatic.com/firebasejs/5.2.0/firebase.js"></script>
@@ -41,7 +40,6 @@
                     <p class="flow-text"> Take a selfie to check you mood! We'll check to see what kind of music to put it to.</p>
                     <video muted id="camera-stream"></video>
                     <p id="error-message"></p>
-                    <img src="" id="snap">
 
                     <!-- Links with click functions -->
                     <div class="controls">
@@ -73,13 +71,14 @@
             </div>
 
             <div class="col s11 m9 l7 musicbar">
-                <h2>Your Music</h2>
+                <h2 class="animate-bottom">Your Music</h2>
                 <div>
-                    <h4>Take a snaphot or type in a mood to get custom playlists!</h4>
+                    <h4 class="animate-bottom">Take a snaphot or type in a mood to get custom playlists!</h4>
 
                     <!-- div that contains loading circle. Not sure where to put this.  -->
                     <div class="loader hide" id="loading"></div>
                     <div style="display:none;" id="myDiv" class="animate-bottom playlistContainer">
+                        <h2>**Insert mood message here**</h2>
                         <div id="musicEmotion" class="carousel"></div>
                     </div>
                 </div>

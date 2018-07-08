@@ -84,7 +84,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
         e.preventDefault();
 
-        $("#camera-stream").addClass("hide");
         $("#loading").removeClass("hide");
 
         //this variable will store the base 64 image source
@@ -92,18 +91,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
         //this is to remove the unnessesary string in the beginnning to pass through API. This gives us the image in base64 string
         var base64Snap = snap.replace("data:image/png;base64,", '');
-
-        var metadata = {
-            contentType: 'image/jpeg',
-        }
-        database.ref().push({
-            base64: base64Snap,
-            file: metadata,
-        });
-
-        // Show image. 
-        image.setAttribute('src', snap);
-        image.classList.add("visible");
 
         // Set the href attribute of the download button to the snap url.
         download_photo_btn.href = snap;
@@ -152,9 +139,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
     });
     /////////END OF TAKE SNAPSHOT CLICK HERE//////////
-    var client_id = '2752cb9f8d0940aeb25e5c564dd68a1e';
-    var client_secret = '07c7345aa3c6424289bb28e7e27b919f';
-    var access_token;
 
     ////////////////////////////////////////////////////
     // SPOTIFY API goes here 
@@ -199,8 +183,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
         
         getArtist(submittedMood, function (data) {
-            console.log(data);
             var playlistArray = data.playlists.items;
+
+            $("#musicEmotion").empty();
 
             for (var i = 0; i < playlistArray.length; i++) {
 
@@ -210,7 +195,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 var allLists = data.playlists.items[i].external_urls.spotify;
 
                 var img = data.playlists.items[i].images[0].url;
-                console.log(img);
+    
                 var playArt = $("<img>");
                 // playArt.addClass("albumSize");
                 playArt.attr("src", img);
@@ -235,10 +220,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 var spotUser = data.playlists.items[i].owner.id;
                 var spotPlaylist = data.playlists.items[i].id;
-                console.log("playlist id: " + spotPlaylist);
-                console.log("user id: " + spotUser);
+                // console.log("playlist id: " + spotPlaylist);
+                // console.log("user id: " + spotUser);
                 var playerLink = "https://open.spotify.com/embed?uri=spotify:user:" + "rebeccatoohey4514" + ":playlist:" + "2HhOFuQcp2FVe9Wdy7SOZQ"
-                console.log("webplayer link: " + playerLink);
+                // console.log("webplayer link: " + playerLink);
                 $("#iframe").attr("src", playerLink);
                 $("#userInputMood").val('');
 
