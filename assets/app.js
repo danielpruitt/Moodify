@@ -24,6 +24,11 @@ document.addEventListener('DOMContentLoaded', function () {
         error_message = document.querySelector('#error-message');
 
 
+    //Spotify API key and access token    
+    var client_id = '2752cb9f8d0940aeb25e5c564dd68a1e';
+    var client_secret = '07c7345aa3c6424289bb28e7e27b919f';
+    var access_token;
+
     // The getUserMedia interface is used for handling camera input.
     // Some browsers need a prefix so here we're covering all the options
     navigator.getMedia = (
@@ -138,6 +143,39 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
 
+    //Access token for Spotify
+    function generateAccessToken(cb) {
+        $.ajax({
+            url: 'https://cors-anywhere.herokuapp.com/https://accounts.spotify.com/api/token',
+            method: "POST",
+            data: {
+                grant_type: "client_credentials"
+            },
+            headers: {
+                Authorization: "Basic " + btoa(client_id + ":" + client_secret)
+            }
+        }).then(res => {
+            access_token = res.access_token;
+            cb();
+        }).catch(err => console.error(err));
+    };
+
+    //Gets artist from Spotify
+    function getArtist(playlist, cb) {
+        $.ajax({
+            method: 'GET',
+            url: 'https://api.spotify.com/v1/search',
+            data: {
+                q: playlist,
+                type: 'playlist'
+            },
+            headers: {
+                Authorization: "Bearer " + access_token
+            }
+        }).then(cb).catch(() => generateAccessToken(() => getArtist(playlist, cb)));
+    };
+
+
     if (!navigator.getMedia) {
         displayErrorMessage("Your browser doesn't have support for the navigator.getUserMedia interface.");
 
@@ -218,7 +256,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }).then(data => {
             //Console logs imgur url of snapshot
-            console.log(data.data.link);
+            // console.log(data.data.link);
             var imgurUrl = data.data.link;
             console.log(imgurUrl);
             ///Emotion analysis API
@@ -231,21 +269,99 @@ document.addEventListener('DOMContentLoaded', function () {
                     "app_key": 'f74c4a76f8186a5c54d2afbe34015740'
                 }
             }).done(function (response) {
-                //console logs array of emotions with values for each: Anger, disgust, fear, joy, sadness, suprise
+                console.log(response);
                 console.log(response.frames[0].people[0].emotions);
                 var kairosEmotion = response.frames[0].people[0].emotions;
-                
-                var emotionSorted = Object.keys(kairosEmotion).sort(function(a,b){return kairosEmotion[a]-kairosEmotion[b]});
-                console.log(emotionSorted);
-                var maxEmotion = emotionSorted[5];
-                console.log(maxEmotion);
+
+                if (kairosEmotion.anger === 0 && kairosEmotion.disgust === 0 && kairosEmotion.fear === 0 && kairosEmotion.joy === 0 && kairosEmotion.sadness === 0 && kairosEmotion.surprise === 0) {
+                    maxEmotion = "neutral";
+                    console.log(maxEmotion);
+                }
+                else {
+                    var emotionSorted = Object.keys(kairosEmotion).sort(function (a, b) { return kairosEmotion[a] - kairosEmotion[b] });
+                    console.log(emotionSorted);
+                    var maxEmotion = emotionSorted[5];
+                    console.log(maxEmotion);
+                };
+
                 $("#photoMood").text("You current mood is " + maxEmotion);
                 database.ref().push({
                     emotion: kairosEmotion,
                     image: imgurUrl,
                     MaxEmotion: maxEmotion,
                     dateAdded: firebase.database.ServerValue.TIMESTAMP
+
+
                 });
+
+
+                ///Spotify API call after Kairos API
+
+                getArtist(maxEmotion, function (data) {
+                    var playlistArray = data.playlists.items;
+
+                    $("#musicEmotion").empty();
+
+                    for (var i = 0; i < playlistArray.length; i++) {
+
+                        var musicEmotion = $("#musicEmotion");
+
+                        var linkDiv = $("<div class='carousel-item'>");
+                        var allLists = data.playlists.items[i].external_urls.spotify;
+
+                        var img = data.playlists.items[i].images[0].url;
+
+                        var playArt = $("<img>");
+                        playArt.attr("src", img);
+
+                        var playName = data.playlists.items[i].name;
+                        var playlistTitle = $("<a>").prepend(playName);
+
+                        playlistTitle.attr("href", allLists);
+                        playlistTitle.attr("target", "blank");
+
+                        // link.attr("href", allLists);
+                        // link.text("Go to playlist!");
+                        // link.attr("target", "blank");
+                        linkDiv.append(playlistTitle);
+                        // linkDiv.append(link);
+                        linkDiv.append(playArt);
+
+                        $("#exportedMood").text("Your " + maxEmotion + " playlists are here! ");
+
+
+                        //adding the page animation when loaded
+                        document.getElementById("myDiv").style.display = "block";
+                        document.getElementById("loadedPlayer").style.display = "block";
+
+                        //adding to the webplayer
+
+                        var spotUser = data.playlists.items[i].owner.id;
+                        var spotPlaylist = data.playlists.items[i].id;
+                        // console.log("playlist id: " + spotPlaylist);
+                        // console.log("user id: " + spotUser);
+
+                        var playerLink = "https://open.spotify.com/embed?uri=spotify:user:" + spotUser + ":playlist:" + spotPlaylist;
+                        var iframeSrc = "https://open.spotify.com/embed?uri=spotify:user:" + data.playlists.items[i].owner.id + ":playlist:" + data.playlists.items[i].id;
+                        // console.log("webplayer link: " + iframeSrc);
+
+
+                        $("#iframe").attr("src", iframeSrc);
+                        $("#userInputMood").val('');
+
+                        musicEmotion.append(linkDiv);
+
+                        $("#musicEmotion").ready(function () {
+                            $('.carousel').carousel(); //carousel init
+                        });
+
+                    }
+
+                });
+
+                //removes loading circle when everything is done
+                $("#loading").addClass("hide");
+
             });
         }).catch(err => console.log(err));
 
@@ -253,54 +369,21 @@ document.addEventListener('DOMContentLoaded', function () {
         delete_photo_btn.classList.remove("disabled");
         download_photo_btn.classList.remove("disabled");
 
-        ////////////////////////////////////////////////////
-        // SPOTIFY API goes here 
-
     });
     /////////END OF TAKE SNAPSHOT CLICK HERE//////////
 
     ////////////////////////////////////////////////////
     // SPOTIFY API goes here 
-    var client_id = '2752cb9f8d0940aeb25e5c564dd68a1e';
-    var client_secret = '07c7345aa3c6424289bb28e7e27b919f';
-    var access_token;
+
 
     $("#submitEmotion").on("click", function (event) {
         event.preventDefault();
         var submittedMood = $("#userInputMood").val().trim();
         console.log(submittedMood);
-        
+
 
         $("#exportedMood").text("Your " + submittedMood + " playlists are here! ");
-        function generateAccessToken(cb) {
-            $.ajax({
-                url: 'https://cors-anywhere.herokuapp.com/https://accounts.spotify.com/api/token',
-                method: "POST",
-                data: {
-                    grant_type: "client_credentials"
-                },
-                headers: {
-                    Authorization: "Basic " + btoa(client_id + ":" + client_secret)
-                }
-            }).then(res => {
-                access_token = res.access_token;
-                cb();
-            }).catch(err => console.error(err));
-        };
 
-        function getArtist(playlist, cb) {
-            $.ajax({
-                method: 'GET',
-                url: 'https://api.spotify.com/v1/search',
-                data: {
-                    q: playlist,
-                    type: 'playlist'
-                },
-                headers: {
-                    Authorization: "Bearer " + access_token
-                }
-            }).then(cb).catch(() => generateAccessToken(() => getArtist(playlist, cb)));
-        };
 
 
         getArtist(submittedMood, function (data) {
@@ -343,7 +426,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 var spotPlaylist = data.playlists.items[i].id;
                 console.log("playlist id: " + spotPlaylist);
                 console.log("user id: " + spotUser);
-                
+
                 var playerLink = "https://open.spotify.com/embed?uri=spotify:user:" + spotUser + ":playlist:" + spotPlaylist;
                 var iframeSrc = "https://open.spotify.com/embed?uri=spotify:user:" + data.playlists.items[i].owner.id + ":playlist:" + data.playlists.items[i].id;
                 console.log("webplayer link: " + iframeSrc);
@@ -368,10 +451,6 @@ document.addEventListener('DOMContentLoaded', function () {
     delete_photo_btn.addEventListener("click", function (e) {
 
         e.preventDefault();
-
-        // Hide image.
-        image.setAttribute('src', "");
-        image.classList.remove("visible");
 
         // Disable delete and save buttons
         delete_photo_btn.classList.add("disabled");
