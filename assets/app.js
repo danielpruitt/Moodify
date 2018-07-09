@@ -38,6 +38,18 @@ document.addEventListener('DOMContentLoaded', function () {
         navigator.msGetUserMedia
     );
 
+    //Firebase data retrieve
+    database.ref().limitToLast(5).orderByChild("dateAdded").on("child_added", function (snapshot) {
+        var sv = snapshot.val();
+
+        console.log(sv.MaxEmotion);
+        var time = moment(sv.dateAdded).format("MMM Do, YYYY hh:mm:ss")
+        var newSearches = $("<p>");
+        newSearches.append(sv.MaxEmotion + ": " + time);
+        $("#firebaseSearches").append(newSearches);
+
+    });
+
     function takeSnapshot() {
         // Here we're using a trick that involves a hidden canvas element.  
 
