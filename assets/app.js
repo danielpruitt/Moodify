@@ -429,12 +429,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 document.getElementById("loadedPlayer").style.display = "block";
                 
                 var uri =  "https://open.spotify.com/embed?uri=" + data.playlists.items[i].uri;
-                console.log(uri)
+                console.log(uri);
+
+                playArt.attr("value", uri);
                 
-                //adding to the webplayer
-                $("img").on("click", function clicky(){
-                    $("#iframe").attr("src",uri)
-                });
+                
                 $("#userInputMood").val('');
 
                 musicEmotion.append(linkDiv);
@@ -466,4 +465,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
     });
 
+    //adding to the webplayer
+    function clicky(){
+        var webLink = $(this).attr("value");
+        $("#iframe").attr("src",webLink);
+    };
+
+    $(document).on("click", "img", clicky);
 });
+
