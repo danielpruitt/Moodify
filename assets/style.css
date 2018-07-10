@@ -89,6 +89,7 @@ img{
     width:170px;
     height:150px;
 }
+
 .submitButton {
     background-color:#1ECC0F;
     font-family: Amaranth, cursive;
@@ -110,15 +111,23 @@ img[src=""]:empty {
     height:125px;
     width:auto;
 }
-
+.albumHolder{
+    height:564px;
+}
 .musicbar{
     color:#ffffff;
     font-family: Amaranth,cursive;
+    
+}
+.carousel-item{
+    margin-top:-50px;
+}
+.album {
+    width:400px;
+    height:400px;
 }
 .playlistContainer {
-    
     background-color:#1f1f1f;
-    
     text-align: center;
     align-content: center;
     border-radius: 25px;
@@ -127,9 +136,7 @@ img[src=""]:empty {
     width:150px;
     height:150px;
 }
-#loadedplayer{
-    
-}
+
 
 /* Styling for loading animation */
 .loader {
@@ -162,7 +169,8 @@ img[src=""]:empty {
 }
 
 iframe{
-    margin-top: 250px;
+    position:fixed;
+    margin-top:40px
 }
 
 /* Animation for page loaded */

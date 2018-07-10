@@ -325,6 +325,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                         var playArt = $("<img>");
                         playArt.attr("src", img);
+                        playArt.addClass("album")
 
                         var playName = data.playlists.items[i].name;
                         var playlistTitle = $("<a>").prepend(playName);
@@ -347,18 +348,11 @@ document.addEventListener('DOMContentLoaded', function () {
                         document.getElementById("loadedPlayer").style.display = "block";
 
                         //adding to the webplayer
-
-                        var spotUser = data.playlists.items[i].owner.id;
-                        var spotPlaylist = data.playlists.items[i].id;
-                        // console.log("playlist id: " + spotPlaylist);
-                        // console.log("user id: " + spotUser);
-
-                        var playerLink = "https://open.spotify.com/embed?uri=spotify:user:" + spotUser + ":playlist:" + spotPlaylist;
-                        var iframeSrc = "https://open.spotify.com/embed?uri=spotify:user:" + data.playlists.items[i].owner.id + ":playlist:" + data.playlists.items[i].id;
-                        // console.log("webplayer link: " + iframeSrc);
-
-
-                        $("#iframe").attr("src", iframeSrc);
+                        var uri =  "https://open.spotify.com/embed?uri=" + data.playlists.items[i].uri;
+                        console.log(uri);
+        
+                        playArt.attr("value", uri);
+                        
                         $("#userInputMood").val('');
 
                         musicEmotion.append(linkDiv);
@@ -414,12 +408,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 var playArt = $("<img>");
                 playArt.attr("src", img);
+                playArt.addClass("album")
 
                 var playName = data.playlists.items[i].name;
                 var playlistTitle = $("<a>").prepend(playName);
 
                 playlistTitle.attr("href", allLists);
                 playlistTitle.attr("target", "blank");
+
                 //appends title and artwork to page
                 linkDiv.append(playlistTitle);
                 linkDiv.append(playArt);
@@ -429,12 +425,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 document.getElementById("loadedPlayer").style.display = "block";
                 
                 var uri =  "https://open.spotify.com/embed?uri=" + data.playlists.items[i].uri;
-                console.log(uri)
+                console.log(uri);
+
+                playArt.attr("value", uri);
                 
-                //adding to the webplayer
-                $("img").on("click", function clicky(){
-                    $("#iframe").attr("src",uri)
-                });
+                
                 $("#userInputMood").val('');
 
                 musicEmotion.append(linkDiv);
@@ -466,4 +461,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
     });
 
+    //adding to the webplayer
+    function clicky(){
+        var webLink = $(this).attr("value");
+        $("#iframe").attr("src",webLink);
+    };
+
+    $(document).on("click", "img", clicky);
 });
