@@ -1,5 +1,9 @@
 document.addEventListener('DOMContentLoaded', function () {
 
+    $(document).ready(function () {
+        $('.tabs').tabs();
+    });
+
     //Initizializing Firebase from Daniel
     var config = {
         apiKey: "AIzaSyBeZWPAnK0TAohDy9esl8V1_VCrcGB5lRM",
@@ -46,7 +50,7 @@ document.addEventListener('DOMContentLoaded', function () {
         var time = moment(sv.dateAdded).format("MMM Do, YYYY hh:mm:ss")
         var newSearches = $("<p>");
         newSearches.append(sv.MaxEmotion + ": " + time);
-        $("#firebaseSearches").append(newSearches);
+        $("#firebaseSearches").prepend(newSearches);
 
     });
 
@@ -299,7 +303,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 $("#photoMood").text("You current mood is " + maxEmotion);
                 database.ref().push({
                     emotion: kairosEmotion,
-                    image: imgurUrl,
                     MaxEmotion: maxEmotion,
                     dateAdded: firebase.database.ServerValue.TIMESTAMP
 
@@ -348,11 +351,11 @@ document.addEventListener('DOMContentLoaded', function () {
                         document.getElementById("loadedPlayer").style.display = "block";
 
                         //adding to the webplayer
-                        var uri =  "https://open.spotify.com/embed?uri=" + data.playlists.items[i].uri;
+                        var uri = "https://open.spotify.com/embed?uri=" + data.playlists.items[i].uri;
                         console.log(uri);
-        
+
                         playArt.attr("value", uri);
-                        
+
                         $("#userInputMood").val('');
 
                         musicEmotion.append(linkDiv);
@@ -384,63 +387,74 @@ document.addEventListener('DOMContentLoaded', function () {
 
     $("#submitEmotion").on("click", function (event) {
         event.preventDefault();
+
         var submittedMood = $("#userInputMood").val().trim();
         console.log(submittedMood);
 
+        if (submittedMood === '') {
+            return
+        }
+        else {
+            $("#loading").removeClass("hide");
 
-        $("#exportedMood").text("Your " + submittedMood + " playlists are here! ");
+            $("#exportedMood").text("Your " + submittedMood + " playlists are here! ");
+
+            getArtist(submittedMood, function (data) {
+                var playlistArray = data.playlists.items;
+
+                $("#musicEmotion").empty();
+
+                for (var i = 0; i < playlistArray.length; i++) {
+
+                    var musicEmotion = $("#musicEmotion");
+
+                    var linkDiv = $("<div class='carousel-item'>");
+                    var allLists = data.playlists.items[i].external_urls.spotify;
+
+                    var img = data.playlists.items[i].images[0].url;
+
+                    var playArt = $("<img>");
+                    playArt.attr("src", img);
+                    playArt.addClass("album")
+
+                    var playName = data.playlists.items[i].name;
+                    var playlistTitle = $("<a>").prepend(playName);
+
+                    playlistTitle.attr("href", allLists);
+                    playlistTitle.attr("target", "blank");
+
+                    //appends title and artwork to page
+                    linkDiv.append(playlistTitle);
+                    linkDiv.append(playArt);
+
+                    //adding the page animation when loaded
+                    document.getElementById("myDiv").style.display = "block";
+                    document.getElementById("loadedPlayer").style.display = "block";
+
+                    var uri = "https://open.spotify.com/embed?uri=" + data.playlists.items[i].uri;
+                    console.log(uri);
+
+                    playArt.attr("value", uri);
+
+
+                    $("#userInputMood").val('');
+
+                    musicEmotion.append(linkDiv);
+
+                    $("#musicEmotion").ready(function () {
+                        $('.carousel').carousel(); //carousel init
+                    });
+
+                    $("#loading").addClass("hide");
+
+
+                };
+
+            });
+        }
 
 
 
-        getArtist(submittedMood, function (data) {
-            var playlistArray = data.playlists.items;
-
-            $("#musicEmotion").empty();
-
-            for (var i = 0; i < playlistArray.length; i++) {
-
-                var musicEmotion = $("#musicEmotion");
-
-                var linkDiv = $("<div class='carousel-item'>");
-                var allLists = data.playlists.items[i].external_urls.spotify;
-
-                var img = data.playlists.items[i].images[0].url;
-
-                var playArt = $("<img>");
-                playArt.attr("src", img);
-                playArt.addClass("album")
-
-                var playName = data.playlists.items[i].name;
-                var playlistTitle = $("<a>").prepend(playName);
-
-                playlistTitle.attr("href", allLists);
-                playlistTitle.attr("target", "blank");
-
-                //appends title and artwork to page
-                linkDiv.append(playlistTitle);
-                linkDiv.append(playArt);
-
-                //adding the page animation when loaded
-                document.getElementById("myDiv").style.display = "block";
-                document.getElementById("loadedPlayer").style.display = "block";
-                
-                var uri =  "https://open.spotify.com/embed?uri=" + data.playlists.items[i].uri;
-                console.log(uri);
-
-                playArt.attr("value", uri);
-                
-                
-                $("#userInputMood").val('');
-
-                musicEmotion.append(linkDiv);
-
-                $("#musicEmotion").ready(function () {
-                    $('.carousel').carousel(); //carousel init
-                });
-
-            }
-
-        });
 
     });
 
@@ -462,9 +476,9 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     //adding to the webplayer
-    function clicky(){
+    function clicky() {
         var webLink = $(this).attr("value");
-        $("#iframe").attr("src",webLink);
+        $("#iframe").attr("src", webLink);
     };
 
     $(document).on("click", "img", clicky);
