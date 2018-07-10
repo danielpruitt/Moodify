@@ -33,7 +33,7 @@
 
         <div class="row">
 
-            <div class="col s12 s3 l2 sidebar animate-bottom">
+            <div class="col s12 m2 l2 sidebar animate-bottom">
 
                 <div>
                     
@@ -79,7 +79,7 @@
 
                     <!-- div that contains loading circle. Not sure where to put this.  -->
                     <div class="loader hide" id="loading"></div>
-                    <div style="display:none;" id="myDiv" class="animate-bottom playlistContainer">
+                    <div style="display:none;" id="myDiv" class="animate-bottom playlistContainer albumHolder">
                         <h2 id="exportedMood"></h2>
                         <div id="musicEmotion" class="carousel"></div>
                     </div>
@@ -87,18 +87,20 @@
             </div>
 
             <div class="col s10 m1 l3 animate-bottom" id="loadedPlayer" style="display:none">
-                <iframe width="340" height="450"  frameborder="0" allowtransparency="true" allow="encrypted-media" id="iframe"></iframe>
+                <iframe width="340" height="549"  frameborder="0" allowtransparency="true" allow="encrypted-media" id="iframe"></iframe>
             </div>
+            
 
 
         </div>
         <div class="row">
-            <div class="col s11 m9 l7 musicbar">
+            <div class="col s1 m2 l3"></div>
+            <div class="col s10 m8 l6 musicbar center-align">
                 <div id="firebaseSearches" class="animate-bottom playlistContainer">
                         <h2>Recent face moods from other users: </h2>
-
                 </div>
             </div>
+            <div class="col s1 m2 l3"></div>
         </div>
     </div>
 
