@@ -420,31 +420,21 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 playlistTitle.attr("href", allLists);
                 playlistTitle.attr("target", "blank");
-
-                // link.attr("href", allLists);
-                // link.text("Go to playlist!");
-                // link.attr("target", "blank");
+                //appends title and artwork to page
                 linkDiv.append(playlistTitle);
-                // linkDiv.append(link);
                 linkDiv.append(playArt);
 
                 //adding the page animation when loaded
                 document.getElementById("myDiv").style.display = "block";
                 document.getElementById("loadedPlayer").style.display = "block";
-
+                
+                var uri =  "https://open.spotify.com/embed?uri=" + data.playlists.items[i].uri;
+                console.log(uri)
+                
                 //adding to the webplayer
-
-                var spotUser = data.playlists.items[i].owner.id;
-                var spotPlaylist = data.playlists.items[i].id;
-                console.log("playlist id: " + spotPlaylist);
-                console.log("user id: " + spotUser);
-
-                var playerLink = "https://open.spotify.com/embed?uri=spotify:user:" + spotUser + ":playlist:" + spotPlaylist;
-                var iframeSrc = "https://open.spotify.com/embed?uri=spotify:user:" + data.playlists.items[i].owner.id + ":playlist:" + data.playlists.items[i].id;
-                console.log("webplayer link: " + iframeSrc);
-
-
-                $("#iframe").attr("src", iframeSrc);
+                $("img").on("click", function clicky(){
+                    $("#iframe").attr("src",uri)
+                });
                 $("#userInputMood").val('');
 
                 musicEmotion.append(linkDiv);
