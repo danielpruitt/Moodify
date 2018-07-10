@@ -86,7 +86,7 @@ h1 {
 }
 
 img{
-    width:170px;
+    width:200px;
     height:150px;
 }
 
@@ -123,8 +123,12 @@ img[src=""]:empty {
     margin-top:-50px;
 }
 .album {
-    width:400px;
-    height:400px;
+    width:500px;
+    height:250px;
+    -webkit-filter: grayscale(100%);
+	filter: grayscale(100%);
+	-webkit-transition: .3s ease-in-out;
+	transition: .3s ease-in-out;
 }
 .playlistContainer {
     background-color:#1f1f1f;
@@ -156,6 +160,36 @@ img[src=""]:empty {
     animation: spin 2s linear infinite;
 }
 
+.carousel .carousel-item img:hover{
+    -webkit-filter: grayscale(0);
+    filter: grayscale(0);
+    
+}
+
+.carousel .carousel-item img:active{
+    transform: translateY(50px);
+}
+
+.tabs{
+    background-color: #1f1f1f;
+    border-radius: 25px;
+}
+
+.tabs .indicator {
+	background-color:#1ECC0F;
+}
+
+.tabs .tab a{
+    color:white;
+}
+
+.tabs .tab a:hover,.tabs .tab a.active {
+	background-color:transparent;
+	color:#1ECC0F;
+}
+.tabs .tab.disabled a,.tabs .tab.disabled a:hover {
+	color:rgba(102,147,153,0.7);	
+}
 
   /* Safari */
 @-webkit-keyframes spin {
@@ -191,4 +225,5 @@ iframe{
     from{ bottom:-100px; opacity:0 } 
     to{ bottom:0; opacity:1 }
 }
+
 

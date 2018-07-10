@@ -35,10 +35,22 @@
 
             <div class="col s12 m2 l2 sidebar animate-bottom">
 
-                <div>
-                    
+                <ul class="tabs tabs-fixed-width">
+                    <li class="tab col s3">
+                        <a id="searchTabButton" href="#submitTab">Search</a>
+                    </li>
+                    <li class="tab col s3">
+                        <a id="cameraTabButton" href="#cameraTab">Camera</a>
+                    </li>
+                </ul>
+
+                <div id="cameraTab">
+
                     <!-- This is a click link for mobile browsers to start the video. Video camera on computer browsers start automatically. -->
                     <a href="#" id="start-camera" class="hide-on-med-and-up">Touch here to start the app.</a>
+                    <div id="cameraTab">
+
+                    </div>
                     <p class="flow-text"> Take a selfie to check your mood!</p>
                     <video muted id="camera-stream"></video>
                     <p id="error-message"></p>
@@ -64,7 +76,7 @@
 
                 </div>
 
-                <div>
+                <div id="submitTab">
                     <form class="input-field card-panel">
                         <label class="center" for="userInputMood"></label>
                         <input id="userInputMood" type="text" class="validate">
@@ -87,17 +99,18 @@
             </div>
 
             <div class="col s10 m1 l3 animate-bottom" id="loadedPlayer" style="display:none">
-                <iframe width="340" height="549"  frameborder="0" allowtransparency="true" allow="encrypted-media" id="iframe"></iframe>
+                <iframe width="340" height="549" frameborder="0" allowtransparency="true" allow="encrypted-media" id="iframe"></iframe>
             </div>
-            
+
 
 
         </div>
         <div class="row">
             <div class="col s1 m2 l3"></div>
             <div class="col s10 m8 l6 musicbar center-align">
-                <div id="firebaseSearches" class="animate-bottom playlistContainer">
-                        <h2>Recent face moods from other users: </h2>
+                <div class="animate-bottom playlistContainer">
+                    <h2>Recent face moods from other users: </h2>
+                    <div id="firebaseSearches"></div>
                 </div>
             </div>
             <div class="col s1 m2 l3"></div>
