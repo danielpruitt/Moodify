@@ -35,17 +35,6 @@ canvas{
     display: none;
 }
 
-/* video#camera-stream.visible,
-img#snap.visible,
-#error-message.visible
-{
-    display: block;
-}
-
-.controls.visible{
-    display: flex;
-} */
-
 .pin-top {
     position: relative;
 }
@@ -86,7 +75,7 @@ h1 {
 }
 
 img{
-    width:200px;
+    width:150px;
     height:150px;
 }
 
@@ -141,7 +130,6 @@ img[src=""]:empty {
     height:150px;
 }
 
-
 /* Styling for loading animation */
 .loader {
     position: absolute;
@@ -169,7 +157,7 @@ img[src=""]:empty {
 .carousel .carousel-item img:active{
     transform: translateY(50px);
 }
-
+/* tab styling */
 .tabs{
     background-color: #1f1f1f;
     border-radius: 25px;
