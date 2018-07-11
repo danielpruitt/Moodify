@@ -224,6 +224,11 @@ document.addEventListener('DOMContentLoaded', function () {
         );
     }
 
+    $("#returnPage").on("click", function(){
+        $(".modal").hide();
+        $("#loading").addClass("hide");
+    });
+
 
 
     // Mobile browsers cannot play video without user input,
@@ -286,19 +291,36 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             }).done(function (response) {
                 console.log(response);
-                console.log(response.frames[0].people[0].emotions);
-                var kairosEmotion = response.frames[0].people[0].emotions;
 
-                if (kairosEmotion.anger === 0 && kairosEmotion.disgust === 0 && kairosEmotion.fear === 0 && kairosEmotion.joy === 0 && kairosEmotion.sadness === 0 && kairosEmotion.surprise === 0) {
-                    maxEmotion = "neutral";
-                    console.log(maxEmotion);
+                var emote = response.frames[0].people[0];
+
+                if (emote == undefined) {
+
+                    $(document).ready(function () {
+                        $('.modal').modal();
+                        $(".modal").modal("open");
+                    });
+
+                    $("#loading").addClass("hide");
+
+                    return
                 }
                 else {
-                    var emotionSorted = Object.keys(kairosEmotion).sort(function (a, b) { return kairosEmotion[a] - kairosEmotion[b] });
-                    console.log(emotionSorted);
-                    var maxEmotion = emotionSorted[5];
-                    console.log(maxEmotion);
-                };
+                    var kairosEmotion = response.frames[0].people[0].emotions;
+
+                    if (kairosEmotion.anger === 0 && kairosEmotion.disgust === 0 && kairosEmotion.fear === 0 && kairosEmotion.joy === 0 && kairosEmotion.sadness === 0 && kairosEmotion.surprise === 0) {
+                        maxEmotion = "neutral";
+                        console.log(maxEmotion);
+                    }
+                    else {
+                        var emotionSorted = Object.keys(kairosEmotion).sort(function (a, b) { return kairosEmotion[a] - kairosEmotion[b] });
+                        console.log(emotionSorted);
+                        var maxEmotion = emotionSorted[5];
+                        console.log(maxEmotion);
+                    };
+                }
+
+
 
                 $("#photoMood").text("You current mood is " + maxEmotion);
                 database.ref().push({
@@ -387,6 +409,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
     $("#submitEmotion").on("click", function (event) {
         event.preventDefault();
+
+
 
         var submittedMood = $("#userInputMood").val().trim();
         console.log(submittedMood);
