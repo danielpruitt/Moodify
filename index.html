@@ -7,14 +7,12 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link rel="shortcut icon" type="image/jpeg" href="assets/images/moodify_logo.jpeg">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css?family=Galada" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Amaranth" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-rc.2/css/materialize.min.css">
     <link rel="stylesheet" href="assets/style.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/momentjs/2.12.0/moment.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-rc.2/js/materialize.min.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/5.2.0/firebase.js"></script>
     <script src="https://www.gstatic.com/firebasejs/5.2.0/firebase.js"></script>
     <title>Moodify</title>
 </head>
@@ -39,96 +37,80 @@
         </div>
     </div>
 
-    <div class="">
-
-        <div class="row">
-
-            <div class="col s12 m2 l2 sidebar animate-bottom">
-
-                <ul class="tabs tabs-fixed-width">
-                    <li class="tab col s3">
-                        <a id="searchTabButton" href="#submitTab">Search</a>
-                    </li>
-                    <li class="tab col s3">
-                        <a id="cameraTabButton" href="#cameraTab">Camera</a>
-                    </li>
-                </ul>
-
+    <div class="row">
+        <!-- column for functionality, camera and search -->
+        <div class="col s12 m2 l2 sidebar animate-bottom">
+            <ul class="tabs tabs-fixed-width">
+                <li class="tab col s3">
+                    <a id="searchTabButton" href="#submitTab">Search</a>
+                </li>
+                <li class="tab col s3">
+                    <a id="cameraTabButton" href="#cameraTab">Camera</a>
+                </li>
+            </ul>
+            <div id="cameraTab">
+                <!-- This is a click link for mobile browsers to start the video. Video camera on computer browsers start automatically. -->
+                <a href="#" id="start-camera" class="hide-on-med-and-up">Touch here to start the app.</a>
                 <div id="cameraTab">
-
-                    <!-- This is a click link for mobile browsers to start the video. Video camera on computer browsers start automatically. -->
-                    <a href="#" id="start-camera" class="hide-on-med-and-up">Touch here to start the app.</a>
-                    <div id="cameraTab">
-
-                    </div>
-                    <p class="flow-text"> Take a selfie to check your mood!</p>
-                    <video muted id="camera-stream"></video>
-                    <p id="error-message"></p>
-
-                    <!-- Links with click functions -->
-                    <div class="controls">
-                        <a href="#" id="take-photo" title="Take Photo">
-                            <i class="btn button">Take Screenshot</i>
-                        </a>
-                        <a href="#" id="download-photo" download="selfie.png" title="Save Photo" class="disabled">
-                            <i class="btn button">Download</i>
-                        </a>
-                        <a href="#" id="delete-photo" title="Delete Photo" class="disabled ">
-                            <i class="btn button">Delete</i>
-                        </a>
-                        <p id="photoMood"></p>
-                    </div>
-
-                    <!-- Hidden canvas element. Used for taking snapshot of video. -->
-                    <!-- The hide class is used to prevent displaying the image within the canvas tag.
-                    The image already shows up in the img tag with the id "snap", so I wanted to hide this to prevent duplicates-->
-                    <canvas class="hide"></canvas>
-
                 </div>
-
-                <div id="submitTab">
-                    <form class="input-field card-panel">
-                        <label class="center" for="userInputMood"></label>
-                        <input id="userInputMood" type="text" class="validate">
-                        <input id="submitEmotion" type="submit" value="Submit" class="btn button submitButton">
-                    </form>
+                <p class="flow-text"> Take a selfie to check your mood!</p>
+                <video muted id="camera-stream"></video>
+                <p id="error-message"></p>
+                <!-- Links with click functions -->
+                <div class="controls">
+                    <a href="#" id="take-photo" title="Take Photo">
+                        <i class="btn button">Take Screenshot</i>
+                    </a>
+                    <a href="#" id="download-photo" download="selfie.png" title="Save Photo" class="disabled">
+                        <i class="btn button">Download</i>
+                    </a>
+                    <a href="#" id="delete-photo" title="Delete Photo" class="disabled ">
+                        <i class="btn button">Delete</i>
+                    </a>
+                    <p id="photoMood"></p>
                 </div>
+                <!-- hides duplicates -->
+                <canvas class="hide"></canvas>
             </div>
-
-            <div class="col s11 m9 l7 musicbar">
-                <div>
-                    <h4 class="animate-bottom"></h4>
-
-                    <!-- div that contains loading circle. Not sure where to put this.  -->
-                    <div class="loader hide" id="loading"></div>
-                    <div style="display:none;" id="myDiv" class="animate-bottom playlistContainer albumHolder">
-                        <h2 id="exportedMood"></h2>
-                        <div id="musicEmotion" class="carousel"></div>
-                    </div>
-                </div>
+            <div id="submitTab">
+                <form class="input-field card-panel">
+                    <label class="center" for="userInputMood"></label>
+                    <input id="userInputMood" type="text" class="validate">
+                    <input id="submitEmotion" type="submit" value="Submit" class="btn button submitButton">
+                </form>
             </div>
-
-            <div class="col s10 m1 l3 animate-bottom" id="loadedPlayer" style="display:none">
-                <iframe width="340" height="549" frameborder="0" allowtransparency="true" allow="encrypted-media" id="iframe"></iframe>
-            </div>
-
-
-
         </div>
-        <div class="row">
-            <div class="col s1 m2 l3"></div>
-            <div class="col s10 m8 l6 musicbar center-align">
-                <div class="animate-bottom playlistContainer">
-                    <h2>Recent face moods from other users: </h2>
-                    <div id="firebaseSearches"></div>
+        <!-- column for playlists to show -->
+        <div class="col s11 m9 l7 musicbar">
+            <div>
+                <h4 class="animate-bottom"></h4>
+                <!-- div that contains loading circle -->
+                <div class="loader hide" id="loading"></div>
+                <div style="display:none;" id="myDiv" class="animate-bottom playlistContainer albumHolder">
+                    <h2 id="exportedMood"></h2>
+                    <div id="musicEmotion" class="carousel"></div>
                 </div>
             </div>
-            <div class="col s1 m2 l3"></div>
         </div>
+        <!-- column for the embeded player -->
+        <div class="col s10 m1 l3 animate-bottom" id="loadedPlayer" style="display:none">
+            <iframe width="340" height="549" frameborder="0" allowtransparency="true" allow="encrypted-media" id="iframe"></iframe>
+        </div>
+
+    </div>
+    <!-- this row is for the Firebase data to prepend -->
+    <div class="row">
+        <div class="col s1 m2 l3"></div>
+        <div class="col s10 m8 l6 musicbar center-align">
+            <div class="animate-bottom playlistContainer">
+                <h2>Recent face moods from other users: </h2>
+                <div id="firebaseSearches"></div>
+            </div>
+        </div>
+        <div class="col s1 m2 l3"></div>
     </div>
 
     <script src="assets/app.js"></script>
-
 </body>
 
 </html>
