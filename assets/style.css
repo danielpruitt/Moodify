@@ -31,6 +31,14 @@
     font-size: 12px;
 }
 
+.controls #download-photo i{
+    font-size: 12px;
+}
+
+.controls #delete-photo i{
+    font-size: 12px;
+}
+
 canvas{
     display: none;
 }
@@ -84,11 +92,6 @@ img{
     font-family: Amaranth, cursive;
 }
 
-#camera-stream{
-    width: 170px;
-    height: 150px;
-}
-
 #start-camera {
     width:170px;
     font-size: 200%;
@@ -111,6 +114,7 @@ img[src=""]:empty {
 .carousel-item{
     margin-top:-50px;
 }
+
 .album {
     width:500px;
     height:250px;
