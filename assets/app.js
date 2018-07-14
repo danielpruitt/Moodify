@@ -219,6 +219,8 @@ take_photo_btn.addEventListener("click", function (e) {
     //this is to remove the unnessesary string in the beginnning to pass through API. This gives us the image in base64 string
     var base64Snap = snap.replace("data:image/png;base64,", '');
 
+    console.log(base64Snap);
+
     // Set the href attribute of the download button to the snap url.
     download_photo_btn.href = snap;
 
@@ -234,7 +236,7 @@ take_photo_btn.addEventListener("click", function (e) {
         url: 'https://api.imgur.com/3/image',
         type: 'POST',
         headers: {
-            'Authorization': 'Client-ID c98e83d1fb7401a'
+            'Authorization': 'client-ID c98e83d1fb7401a'
         },
         data: {
             image: base64Snap
