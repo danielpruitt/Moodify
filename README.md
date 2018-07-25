@@ -1,7 +1,7 @@
 # ProjectOne
 # Moodify
 
-https://danielpruitt.github.io/Moodify/
+https://apark5040.github.io/Moodify/
 
 This is an app that reads the mood of the user and returns playlists based of the user's mood. 
 APIs used:
@@ -10,9 +10,6 @@ Kairos- facial recognition software, uses the face image url from imgur and retu
 Spotify- after sorting the moods from Kairos, the emotion with the highest value is used to return Spotify playlists    
     the Spotify playlists shows the playlist art cover, a link to open the Spotify page or app(if on mobile), and clicking the album art will trigger the embeded player
 
-
-Firebase:
-We are logging the max emotion from Kairos and the timestamp of that emotion in Firebase which also appends to the page to show what recent users(5) have had for their mood. 
 
 Alternate if camera permissions is denied or not available:
 We have added a search feature to search moods if there is no access to the camera. It functions as a failsafe and as a way to expand the paramaters of the Spotify API usage. 
