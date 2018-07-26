@@ -1,20 +1,7 @@
-
 //Materialize tabs will initiate when page loads
 $(document).ready(function () {
     $('.tabs').tabs();
 });
-
-//Initizializing Firebase from Daniel
-var config = {
-    apiKey: "AIzaSyBeZWPAnK0TAohDy9esl8V1_VCrcGB5lRM",
-    authDomain: "moodify-3d415.firebaseapp.com",
-    databaseURL: "https://moodify-3d415.firebaseio.com",
-    projectId: "moodify-3d415",
-    storageBucket: "moodify-3d415.appspot.com",
-    messagingSenderId: "854313353749"
-};
-firebase.initializeApp(config);
-var database = firebase.database();
 
 
 // References to all the element we will need.
@@ -44,19 +31,6 @@ navigator.getMedia = (
     navigator.msGetUserMedia
 );
 
-//Firebase data retrieve
-database.ref().limitToLast(5).orderByChild("dateAdded").on("child_added", function (snapshot) {
-    var sv = snapshot.val();
-
-    //converts time stamp to readable date and time
-    var time = moment(sv.dateAdded).format("MMM Do, YYYY hh:mm:ss");
-
-    //creates a p tag for each recent face moods and appends them to existing div
-    var newSearches = $("<p>");
-    newSearches.append(sv.MaxEmotion + ": " + time);
-    $("#firebaseSearches").prepend(newSearches);
-
-});
 
 //Shows the camera and the buttons
 function showVideo() {
@@ -122,7 +96,7 @@ function generateAccessToken(cb) {
         headers: {
 
             //adds API key and API secret
-            Authorization: "Basic " + btoa(client_id + ":" + client_secret)
+            Authorization: "Basic " + btoa(spotify_id + ":" + spotify_secret)
         }
     }).then(res => {
 
@@ -297,13 +271,6 @@ take_photo_btn.addEventListener("click", function (e) {
 
             $("#photoMood").text("You current mood is " + maxEmotion);
 
-            //pushes emotion object, top values emotion, and time stamp into firebase
-            database.ref().push({
-                emotion: kairosEmotion,
-                MaxEmotion: maxEmotion,
-                dateAdded: firebase.database.ServerValue.TIMESTAMP
-            });
-
 
             ///gets artist and creates carousel and Spotify iframe
             getArtist(maxEmotion, function (data) {
@@ -443,9 +410,6 @@ $("#submitEmotion").on("click", function (event) {
 
         });
     }
-
-
-
 
 });
 
