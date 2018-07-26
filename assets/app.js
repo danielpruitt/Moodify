@@ -4,18 +4,6 @@ $(document).ready(function () {
     $('.tabs').tabs();
 });
 
-//Initizializing Firebase from Daniel
-var config = {
-    apiKey: "AIzaSyBeZWPAnK0TAohDy9esl8V1_VCrcGB5lRM",
-    authDomain: "moodify-3d415.firebaseapp.com",
-    databaseURL: "https://moodify-3d415.firebaseio.com",
-    projectId: "moodify-3d415",
-    storageBucket: "moodify-3d415.appspot.com",
-    messagingSenderId: "854313353749"
-};
-firebase.initializeApp(config);
-var database = firebase.database();
-
 
 // References to all the element we will need.
 var video = document.querySelector('#camera-stream'),
@@ -28,8 +16,8 @@ var video = document.querySelector('#camera-stream'),
 
 
 //Spotify API key and access token    
-var client_id = '2752cb9f8d0940aeb25e5c564dd68a1e';
-var client_secret = '07c7345aa3c6424289bb28e7e27b919f';
+var spotify_id = spotify.client_id;
+var spotify_secret = spotify.client_secret;
 var access_token;
 
 // The getUserMedia interface is used for handling camera input.
@@ -41,19 +29,6 @@ navigator.getMedia = (
     navigator.msGetUserMedia
 );
 
-//Firebase data retrieve
-database.ref().limitToLast(5).orderByChild("dateAdded").on("child_added", function (snapshot) {
-    var sv = snapshot.val();
-
-    //converts time stamp to readable date and time
-    var time = moment(sv.dateAdded).format("MMM Do, YYYY hh:mm:ss");
-
-    //creates a p tag for each recent face moods and appends them to existing div
-    var newSearches = $("<p>");
-    newSearches.append(sv.MaxEmotion + ": " + time);
-    $("#firebaseSearches").prepend(newSearches);
-
-});
 
 //Shows the camera and the buttons
 function showVideo() {
@@ -119,7 +94,7 @@ function generateAccessToken(cb) {
         headers: {
 
             //adds API key and API secret
-            Authorization: "Basic " + btoa(client_id + ":" + client_secret)
+            Authorization: "Basic " + btoa(spotify_id + ":" + spotify_secret)
         }
     }).then(res => {
 
@@ -293,13 +268,6 @@ take_photo_btn.addEventListener("click", function (e) {
 
 
             $("#photoMood").text("You current mood is " + maxEmotion);
-
-            //pushes emotion object, top values emotion, and time stamp into firebase
-            database.ref().push({
-                emotion: kairosEmotion,
-                MaxEmotion: maxEmotion,
-                dateAdded: firebase.database.ServerValue.TIMESTAMP
-            });
 
 
             ///gets artist and creates carousel and Spotify iframe
