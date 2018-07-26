@@ -1,4 +1,3 @@
-
 //Materialize tabs will initiate when page loads
 $(document).ready(function () {
     $('.tabs').tabs();
@@ -16,9 +15,12 @@ var video = document.querySelector('#camera-stream'),
 
 
 //Spotify API key and access token    
-var spotify_id = spotify.client_id;
-var spotify_secret = spotify.client_secret;
+var client_id = keys.spotify_id;
+var client_secret = keys.spotify_secret;
 var access_token;
+
+console.log(client_id);
+console.log(client_secret)
 
 // The getUserMedia interface is used for handling camera input.
 // Some browsers need a prefix so here we're covering all the options
@@ -211,7 +213,7 @@ take_photo_btn.addEventListener("click", function (e) {
         url: 'https://api.imgur.com/3/image',
         type: 'POST',
         headers: {
-            'Authorization': 'client-ID c98e83d1fb7401a'
+            'Authorization': keys.imgur_id
         },
         data: {
             image: base64Snap
@@ -228,8 +230,8 @@ take_photo_btn.addEventListener("click", function (e) {
             type: 'POST',
             headers: {
                 "Content-type": "application/json",
-                "app_id": '5989e8db',
-                "app_key": 'f74c4a76f8186a5c54d2afbe34015740'
+                "app_id": keys.kairos_id,
+                "app_key": keys.kairos_key
             }
         }).done(function (response) {
             console.log(response);
@@ -408,9 +410,6 @@ $("#submitEmotion").on("click", function (event) {
 
         });
     }
-
-
-
 
 });
 
