@@ -13,7 +13,7 @@ Spotify- after sorting the moods from Kairos, the emotion with the highest value
 Alternate if camera permissions is denied or not available:
 We have added a search feature to search moods if there is no access to the camera. It functions as a failsafe and as a way to expand the paramaters of the Spotify API usage. 
 
-Collabators: Andrew Park, Daniel Pruitt 
+Collabators: Richard Covington, Abram Arruda, Andrew Park, Daniel Pruitt 
 
 
 
