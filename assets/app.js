@@ -19,9 +19,6 @@ var client_id = keys.spotify_id;
 var client_secret = keys.spotify_secret;
 var access_token;
 
-console.log(client_id);
-console.log(client_secret)
-
 // The getUserMedia interface is used for handling camera input.
 // Some browsers need a prefix so here we're covering all the options
 navigator.getMedia = (
@@ -96,7 +93,7 @@ function generateAccessToken(cb) {
         headers: {
 
             //adds API key and API secret
-            Authorization: "Basic " + btoa(spotify_id + ":" + spotify_secret)
+            Authorization: "Basic " + btoa(client_id + ":" + client_secret)
         }
     }).then(res => {
 
@@ -196,7 +193,7 @@ take_photo_btn.addEventListener("click", function (e) {
     //this is to remove the unnessesary string in the beginnning to pass through API. This gives us the image in base64 string
     var base64Snap = snap.replace("data:image/png;base64,", '');
 
-    console.log(base64Snap);
+    // console.log(base64Snap);
 
     // Set the href attribute of the download button to the snap url.
     download_photo_btn.href = snap;
@@ -219,10 +216,11 @@ take_photo_btn.addEventListener("click", function (e) {
             image: base64Snap
         }
     }).then(data => {
-
+        console.log(data)
         //gets imgur url
         var imgurUrl = data.data.link;
-        console.log(imgurUrl);
+        var imgurID = data.data.link;
+        console.log("IMGUR url: " +  imgurUrl);
 
         ///Emotion analysis API. Uses imgur url as input along with API key and ID
         $.ajax({
@@ -266,7 +264,8 @@ take_photo_btn.addEventListener("click", function (e) {
                     var emotionSorted = Object.keys(kairosEmotion).sort(function (a, b) { return kairosEmotion[a] - kairosEmotion[b] });
                     var maxEmotion = emotionSorted[5];
                 };
-            }
+            };
+            
 
 
             $("#photoMood").text("You current mood is " + maxEmotion);
