@@ -1,7 +1,7 @@
 # Moodify
 
 https://apark5040.github.io/Moodify/
-
+or
 https://danielpruitt.github.io/Moodify/
 
 This is an app that reads the mood of the user and returns playlists based of the user's mood. 
