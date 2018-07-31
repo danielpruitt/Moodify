@@ -2,6 +2,8 @@
 
 https://apark5040.github.io/Moodify/
 
+https://danielpruitt.github.io/Moodify/
+
 This is an app that reads the mood of the user and returns playlists based of the user's mood. 
 APIs used:
 Imgur - take the snapshot photo to post to imgur and then return the imgur url
