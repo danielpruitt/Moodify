@@ -15,9 +15,12 @@ var video = document.querySelector('#camera-stream'),
 
 
 //Spotify API key and access token    
-var client_id = keys.spotify_id;
-var client_secret = keys.spotify_secret;
+var client_id = "2752cb9f8d0940aeb25e5c564dd68a1e";
+var client_secret = "07c7345aa3c6424289bb28e7e27b919f";
 var access_token;
+var imgur_id = "client-ID c98e83d1fb7401a";
+var kairos_id = "5989e8db";
+var kairos_key = "f74c4a76f8186a5c54d2afbe34015740"
 
 // The getUserMedia interface is used for handling camera input.
 // Some browsers need a prefix so here we're covering all the options
@@ -210,7 +213,7 @@ take_photo_btn.addEventListener("click", function (e) {
         url: 'https://api.imgur.com/3/image',
         type: 'POST',
         headers: {
-            'Authorization': keys.imgur_id
+            'Authorization': imgur_id
         },
         data: {
             image: base64Snap
@@ -228,8 +231,8 @@ take_photo_btn.addEventListener("click", function (e) {
             type: 'POST',
             headers: {
                 "Content-type": "application/json",
-                "app_id": keys.kairos_id,
-                "app_key": keys.kairos_key
+                "app_id": kairos_id,
+                "app_key":kairos_key
             }
         }).done(function (response) {
             console.log(response);
