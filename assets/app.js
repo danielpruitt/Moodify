@@ -222,8 +222,9 @@ take_photo_btn.addEventListener("click", function (e) {
         console.log(data)
         //gets imgur url
         var imgurUrl = data.data.link;
-        var imgurID = data.data.link;
+        var imgurDelete = data.data.deletehash;
         console.log("IMGUR url: " +  imgurUrl);
+        console.log(imgurDelete);
 
         ///Emotion analysis API. Uses imgur url as input along with API key and ID
         $.ajax({
@@ -334,6 +335,19 @@ take_photo_btn.addEventListener("click", function (e) {
 
             //removes loading circle when everything is done
             $("#loading").addClass("hide");
+
+            //Another Imgur ajax to delete the uploaded image
+            $.ajax({
+                url: 'https://api.imgur.com/3/image/'+imgurDelete,
+                type: 'DELETE',
+                headers: {
+                    'Authorization': keys.imgur_id
+                }
+            }).then(data => {
+        
+                console.log("Image deleted from Imgur");
+        
+            });
 
         });
     }).catch(err => console.log(err));
