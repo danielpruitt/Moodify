@@ -8,7 +8,7 @@ https://danielpruitt.github.io/Moodify/
 This is a front-end app that reads the mood of the user and returns playlists based of the user's mood using APIs. 
 
 
-[Moodify_01](images/moodify_01.png)
+![Moodify_01](assets/images/moodify_01.png)
 
 
 
