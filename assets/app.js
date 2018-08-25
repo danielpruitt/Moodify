@@ -30,9 +30,6 @@ var video = document.querySelector('#camera-stream'),
 
 database.ref().on("value", function (snapshot) {
 
-    // Print the initial data to the console.
-    console.log(snapshot.val());
-
     // Log the value of the various properties
     var client_id = snapshot.val().client_id;
 
