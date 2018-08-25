@@ -1,7 +1,19 @@
+// Initialize Firebase
+var config = {
+    apiKey: "AIzaSyBeZWPAnK0TAohDy9esl8V1_VCrcGB5lRM",
+    authDomain: "moodify-3d415.firebaseapp.com",
+    databaseURL: "https://moodify-3d415.firebaseio.com",
+    projectId: "moodify-3d415",
+    storageBucket: "moodify-3d415.appspot.com",
+    messagingSenderId: "854313353749"
+};
+firebase.initializeApp(config);
+var database = firebase.database();
 //Materialize tabs will initiate when page loads
 $(document).ready(function () {
     $('.tabs').tabs();
 });
+
 
 
 // References to all the element we will need.
@@ -14,13 +26,310 @@ var video = document.querySelector('#camera-stream'),
     error_message = document.querySelector('#error-message');
 
 
-//Spotify API key and access token    
-var client_id = "2752cb9f8d0940aeb25e5c564dd68a1e";
-var client_secret = "07c7345aa3c6424289bb28e7e27b919f";
-var access_token;
-var imgur_id = "client-ID c98e83d1fb7401a";
-var kairos_id = "5989e8db";
-var kairos_key = "f74c4a76f8186a5c54d2afbe34015740"
+
+
+database.ref().on("value", function (snapshot) {
+
+    // Print the initial data to the console.
+    console.log(snapshot.val());
+
+    // Log the value of the various properties
+    var client_id = snapshot.val().client_id;
+
+    var access_token;
+
+    var client_id = snapshot.val().client_id;
+    var client_secret = snapshot.val().client_secret;
+
+    var imgur_id = snapshot.val().imgur_id;
+    var kairos_id = snapshot.val().kairos_id;
+    var kairos_key = snapshot.val().kairos_key;
+
+    function generateAccessToken(cb) {
+        $.ajax({
+            url: 'https://cors-anywhere.herokuapp.com/https://accounts.spotify.com/api/token',
+            method: "POST",
+            data: {
+                grant_type: "client_credentials"
+            },
+            headers: {
+
+                //adds API key and API secret
+                Authorization: "Basic " + btoa(client_id + ":" + client_secret)
+            }
+        }).then(res => {
+
+            //grabs access token from response and stores in variable
+            access_token = res.access_token;
+            cb();
+
+            //console logs error message
+        }).catch(err => console.error(err));
+    };
+
+    function getArtist(playlist, cb) {
+        $.ajax({
+            method: 'GET',
+            url: 'https://api.spotify.com/v1/search',
+            data: {
+                q: playlist,
+                type: 'playlist'
+            },
+            headers: {
+                //uses access token and adds it to authorization header
+                Authorization: "Bearer " + access_token
+            }
+
+            //when catched, uses access token and use the getArtist function
+        }).then(cb).catch(() => generateAccessToken(() => getArtist(playlist, cb)));
+    };
+
+    take_photo_btn.addEventListener("click", function (e) {
+
+        e.preventDefault();
+
+        //shows the loading animation
+        $("#loading").removeClass("hide");
+
+        //this variable will store the base 64 image source
+        var snap = takeSnapshot();
+
+        //this is to remove the unnessesary string in the beginnning to pass through API. This gives us the image in base64 string
+        var base64Snap = snap.replace("data:image/png;base64,", '');
+
+        // console.log(base64Snap);
+
+        // Set the href attribute of the download button to the snap url.
+        download_photo_btn.href = snap;
+
+        // Pause video playback of stream. Comment it to keep video playing even after taking snapshot
+        video.pause();
+
+        ///////////////////////////
+        //API CALLS///
+        //////////////////////////////////////////////////
+
+        ////Imgur API used to convert base64 to a usable image url
+        $.ajax({
+            url: 'https://api.imgur.com/3/image',
+            type: 'POST',
+            headers: {
+                'Authorization': imgur_id
+            },
+            data: {
+                image: base64Snap
+            }
+        }).then(data => {
+            console.log(data)
+            //gets imgur url
+            var imgurUrl = data.data.link;
+            console.log("IMGUR url: " + imgurUrl);
+
+            ///Emotion analysis API. Uses imgur url as input along with API key and ID
+            $.ajax({
+                url: 'https://api.kairos.com/v2/media' + '?source=' + data.data.link,
+                type: 'POST',
+                headers: {
+                    "Content-type": "application/json",
+                    "app_id": kairos_id,
+                    "app_key": kairos_key
+                }
+            }).done(function (response) {
+                console.log(response);
+
+                //emotion object
+                var emote = response.frames[0].people[0];
+
+                //reveals modal if there is no emotion object. This is to check if the picture is taken well or if there are no faces
+                if (emote == undefined) {
+
+                    //initiates and shows modal
+                    $(document).ready(function () {
+                        $('.modal').modal();
+                        $(".modal").modal("open");
+                    });
+
+                    //hides the loading animation
+                    $("#loading").addClass("hide");
+
+                    return
+                }
+                else {
+
+                    //Object of the 6 emotions with values for each: anger, disgust, fear, joy, sadness, and surprise. 
+                    var kairosEmotion = response.frames[0].people[0].emotions;
+
+                    //this is to check if all values are 0. 
+                    if (kairosEmotion.anger === 0 && kairosEmotion.disgust === 0 && kairosEmotion.fear === 0 && kairosEmotion.joy === 0 && kairosEmotion.sadness === 0 && kairosEmotion.surprise === 0) {
+                        maxEmotion = "neutral";
+                    }
+                    else {
+                        var emotionSorted = Object.keys(kairosEmotion).sort(function (a, b) { return kairosEmotion[a] - kairosEmotion[b] });
+                        var maxEmotion = emotionSorted[5];
+                    };
+                };
+
+
+
+                $("#photoMood").text("You current mood is " + maxEmotion);
+
+
+                ///gets artist and creates carousel and Spotify iframe
+                getArtist(maxEmotion, function (data) {
+
+                    var playlistArray = data.playlists.items;
+
+                    //emptys div to prevent more additions
+                    $("#musicEmotion").empty();
+
+                    //gets all the spotify playlist and puts them in the carousel
+                    for (var i = 0; i < playlistArray.length; i++) {
+
+                        var musicEmotion = $("#musicEmotion");
+
+                        //creates div for each item in carousel
+                        var linkDiv = $("<div class='carousel-item'>");
+                        var allLists = data.playlists.items[i].external_urls.spotify;
+
+                        var img = data.playlists.items[i].images[0].url;
+
+                        //adds playlist art
+                        var playArt = $("<img>");
+                        playArt.attr("src", img);
+                        playArt.addClass("album")
+
+                        var playName = data.playlists.items[i].name;
+                        var playlistTitle = $("<a>").prepend(playName);
+
+                        playlistTitle.attr("href", allLists);
+                        playlistTitle.attr("target", "blank");
+
+                        linkDiv.append(playlistTitle);
+                        linkDiv.append(playArt);
+
+                        $("#exportedMood").text("Your " + maxEmotion + " playlists are here! ");
+
+
+                        //adding the page animation when loaded
+                        document.getElementById("myDiv").style.display = "block";
+                        document.getElementById("loadedPlayer").style.display = "block";
+
+                        //adding to the webplayer
+                        var uri = "https://open.spotify.com/embed?uri=" + data.playlists.items[i].uri;
+
+                        playArt.attr("value", uri);
+
+                        $("#userInputMood").val('');
+
+                        musicEmotion.append(linkDiv);
+
+                        //carousel initiate
+                        $("#musicEmotion").ready(function () {
+                            $('.carousel').carousel();
+                        });
+
+                    }
+
+                });
+
+                //removes loading circle when everything is done
+                $("#loading").addClass("hide");
+
+                //Another Imgur ajax to delete the uploaded image
+                $.ajax({
+                    url: 'https://api.imgur.com/3/image/' + imgurDelete,
+                    type: 'DELETE',
+                    headers: {
+                        'Authorization': keys.imgur_id
+                    }
+                }).then(data => {
+
+                    console.log("Image deleted from Imgur");
+
+                });
+
+            });
+        }).catch(err => console.log(err));
+
+        // Enable delete and save buttons
+        delete_photo_btn.classList.remove("disabled");
+        download_photo_btn.classList.remove("disabled");
+
+    });
+
+
+    //function for submit earch button
+    $("#submitEmotion").on("click", function (event) {
+        event.preventDefault();
+
+        //input from form
+        var submittedMood = $("#userInputMood").val().trim();
+
+        //checks if there is any blanks
+        if (submittedMood === '') {
+            return
+        }
+        else {
+            $("#loading").removeClass("hide");
+
+            $("#exportedMood").text("Your " + submittedMood + " playlists are here! ");
+
+            getArtist(submittedMood, function (data) {
+                var playlistArray = data.playlists.items;
+
+                $("#musicEmotion").empty();
+
+                for (var i = 0; i < playlistArray.length; i++) {
+
+                    var musicEmotion = $("#musicEmotion");
+
+                    var linkDiv = $("<div class='carousel-item'>");
+                    var allLists = data.playlists.items[i].external_urls.spotify;
+
+                    var img = data.playlists.items[i].images[0].url;
+
+                    var playArt = $("<img>");
+                    playArt.attr("src", img);
+                    playArt.addClass("album")
+
+                    var playName = data.playlists.items[i].name;
+                    var playlistTitle = $("<a>").prepend(playName);
+
+                    playlistTitle.attr("href", allLists);
+                    playlistTitle.attr("target", "blank");
+
+                    //appends title and artwork to page
+                    linkDiv.append(playlistTitle);
+                    linkDiv.append(playArt);
+
+                    //adding the page animation when loaded
+                    document.getElementById("myDiv").style.display = "block";
+                    document.getElementById("loadedPlayer").style.display = "block";
+
+                    var uri = "https://open.spotify.com/embed?uri=" + data.playlists.items[i].uri;
+
+                    playArt.attr("value", uri);
+
+
+                    $("#userInputMood").val('');
+
+                    musicEmotion.append(linkDiv);
+
+                    $("#musicEmotion").ready(function () {
+                        $('.carousel').carousel();
+                    });
+
+                    $("#loading").addClass("hide");
+
+                };
+
+            });
+        }
+
+    });
+
+});
+
 
 // The getUserMedia interface is used for handling camera input.
 // Some browsers need a prefix so here we're covering all the options
@@ -86,45 +395,10 @@ function hideUI() {
 };
 
 //Access token for Spotify
-function generateAccessToken(cb) {
-    $.ajax({
-        url: 'https://cors-anywhere.herokuapp.com/https://accounts.spotify.com/api/token',
-        method: "POST",
-        data: {
-            grant_type: "client_credentials"
-        },
-        headers: {
 
-            //adds API key and API secret
-            Authorization: "Basic " + btoa(client_id + ":" + client_secret)
-        }
-    }).then(res => {
-
-        //grabs access token from response and stores in variable
-        access_token = res.access_token;
-        cb();
-
-        //console logs error message
-    }).catch(err => console.error(err));
-};
 
 //Gets artist from Spotify
-function getArtist(playlist, cb) {
-    $.ajax({
-        method: 'GET',
-        url: 'https://api.spotify.com/v1/search',
-        data: {
-            q: playlist,
-            type: 'playlist'
-        },
-        headers: {
-            //uses access token and adds it to authorization header
-            Authorization: "Bearer " + access_token
-        }
 
-        //when catched, uses access token and use the getArtist function
-    }).then(cb).catch(() => generateAccessToken(() => getArtist(playlist, cb)));
-};
 
 //error message for when browser doesn't support the media interface
 if (!navigator.getMedia) {
@@ -183,251 +457,10 @@ start_camera.addEventListener("click", function (e) {
 
 });
 
-take_photo_btn.addEventListener("click", function (e) {
 
-    e.preventDefault();
-
-    //shows the loading animation
-    $("#loading").removeClass("hide");
-
-    //this variable will store the base 64 image source
-    var snap = takeSnapshot();
-
-    //this is to remove the unnessesary string in the beginnning to pass through API. This gives us the image in base64 string
-    var base64Snap = snap.replace("data:image/png;base64,", '');
-
-    // console.log(base64Snap);
-
-    // Set the href attribute of the download button to the snap url.
-    download_photo_btn.href = snap;
-
-    // Pause video playback of stream. Comment it to keep video playing even after taking snapshot
-    video.pause();
-
-    ///////////////////////////
-    //API CALLS///
-    //////////////////////////////////////////////////
-
-    ////Imgur API used to convert base64 to a usable image url
-    $.ajax({
-        url: 'https://api.imgur.com/3/image',
-        type: 'POST',
-        headers: {
-            'Authorization': imgur_id
-        },
-        data: {
-            image: base64Snap
-        }
-    }).then(data => {
-        console.log(data)
-        //gets imgur url
-        var imgurUrl = data.data.link;
-        var imgurDelete = data.data.deletehash;
-        console.log("IMGUR url: " +  imgurUrl);
-        console.log(imgurDelete);
-
-        ///Emotion analysis API. Uses imgur url as input along with API key and ID
-        $.ajax({
-            url: 'https://api.kairos.com/v2/media' + '?source=' + data.data.link,
-            type: 'POST',
-            headers: {
-                "Content-type": "application/json",
-                "app_id": kairos_id,
-                "app_key":kairos_key
-            }
-        }).done(function (response) {
-            console.log(response);
-
-            //emotion object
-            var emote = response.frames[0].people[0];
-
-            //reveals modal if there is no emotion object. This is to check if the picture is taken well or if there are no faces
-            if (emote == undefined) {
-
-                //initiates and shows modal
-                $(document).ready(function () {
-                    $('.modal').modal();
-                    $(".modal").modal("open");
-                });
-
-                //hides the loading animation
-                $("#loading").addClass("hide");
-
-                return
-            }
-            else {
-
-                //Object of the 6 emotions with values for each: anger, disgust, fear, joy, sadness, and surprise. 
-                var kairosEmotion = response.frames[0].people[0].emotions;
-
-                //this is to check if all values are 0. 
-                if (kairosEmotion.anger === 0 && kairosEmotion.disgust === 0 && kairosEmotion.fear === 0 && kairosEmotion.joy === 0 && kairosEmotion.sadness === 0 && kairosEmotion.surprise === 0) {
-                    maxEmotion = "neutral";
-                }
-                else {
-                    var emotionSorted = Object.keys(kairosEmotion).sort(function (a, b) { return kairosEmotion[a] - kairosEmotion[b] });
-                    var maxEmotion = emotionSorted[5];
-                };
-            };
-            
-
-
-            $("#photoMood").text("You current mood is " + maxEmotion);
-
-
-            ///gets artist and creates carousel and Spotify iframe
-            getArtist(maxEmotion, function (data) {
-
-                var playlistArray = data.playlists.items;
-
-                //emptys div to prevent more additions
-                $("#musicEmotion").empty();
-
-                //gets all the spotify playlist and puts them in the carousel
-                for (var i = 0; i < playlistArray.length; i++) {
-
-                    var musicEmotion = $("#musicEmotion");
-
-                    //creates div for each item in carousel
-                    var linkDiv = $("<div class='carousel-item'>");
-                    var allLists = data.playlists.items[i].external_urls.spotify;
-
-                    var img = data.playlists.items[i].images[0].url;
-
-                    //adds playlist art
-                    var playArt = $("<img>");
-                    playArt.attr("src", img);
-                    playArt.addClass("album")
-
-                    var playName = data.playlists.items[i].name;
-                    var playlistTitle = $("<a>").prepend(playName);
-
-                    playlistTitle.attr("href", allLists);
-                    playlistTitle.attr("target", "blank");
-
-                    linkDiv.append(playlistTitle);
-                    linkDiv.append(playArt);
-
-                    $("#exportedMood").text("Your " + maxEmotion + " playlists are here! ");
-
-
-                    //adding the page animation when loaded
-                    document.getElementById("myDiv").style.display = "block";
-                    document.getElementById("loadedPlayer").style.display = "block";
-
-                    //adding to the webplayer
-                    var uri = "https://open.spotify.com/embed?uri=" + data.playlists.items[i].uri;
-
-                    playArt.attr("value", uri);
-
-                    $("#userInputMood").val('');
-
-                    musicEmotion.append(linkDiv);
-
-                    //carousel initiate
-                    $("#musicEmotion").ready(function () {
-                        $('.carousel').carousel();
-                    });
-
-                }
-
-            });
-
-            //removes loading circle when everything is done
-            $("#loading").addClass("hide");
-
-            //Another Imgur ajax to delete the uploaded image
-            $.ajax({
-                url: 'https://api.imgur.com/3/image/'+imgurDelete,
-                type: 'DELETE',
-                headers: {
-                    'Authorization': keys.imgur_id
-                }
-            }).then(data => {
-        
-                console.log("Image deleted from Imgur");
-        
-            });
-
-        });
-    }).catch(err => console.log(err));
-
-    // Enable delete and save buttons
-    delete_photo_btn.classList.remove("disabled");
-    download_photo_btn.classList.remove("disabled");
-
-});
 /////////END OF TAKE SNAPSHOT CLICK HERE//////////
 
-//function for submit earch button
-$("#submitEmotion").on("click", function (event) {
-    event.preventDefault();
 
-    //input from form
-    var submittedMood = $("#userInputMood").val().trim();
-
-    //checks if there is any blanks
-    if (submittedMood === '') {
-        return
-    }
-    else {
-        $("#loading").removeClass("hide");
-
-        $("#exportedMood").text("Your " + submittedMood + " playlists are here! ");
-
-        getArtist(submittedMood, function (data) {
-            var playlistArray = data.playlists.items;
-
-            $("#musicEmotion").empty();
-
-            for (var i = 0; i < playlistArray.length; i++) {
-
-                var musicEmotion = $("#musicEmotion");
-
-                var linkDiv = $("<div class='carousel-item'>");
-                var allLists = data.playlists.items[i].external_urls.spotify;
-
-                var img = data.playlists.items[i].images[0].url;
-
-                var playArt = $("<img>");
-                playArt.attr("src", img);
-                playArt.addClass("album")
-
-                var playName = data.playlists.items[i].name;
-                var playlistTitle = $("<a>").prepend(playName);
-
-                playlistTitle.attr("href", allLists);
-                playlistTitle.attr("target", "blank");
-
-                //appends title and artwork to page
-                linkDiv.append(playlistTitle);
-                linkDiv.append(playArt);
-
-                //adding the page animation when loaded
-                document.getElementById("myDiv").style.display = "block";
-                document.getElementById("loadedPlayer").style.display = "block";
-
-                var uri = "https://open.spotify.com/embed?uri=" + data.playlists.items[i].uri;
-
-                playArt.attr("value", uri);
-
-
-                $("#userInputMood").val('');
-
-                musicEmotion.append(linkDiv);
-
-                $("#musicEmotion").ready(function () {
-                    $('.carousel').carousel();
-                });
-
-                $("#loading").addClass("hide");
-
-            };
-
-        });
-    }
-
-});
 
 //button deletes photo and restarts camerea
 delete_photo_btn.addEventListener("click", function (e) {
