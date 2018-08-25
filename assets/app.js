@@ -1,312 +1,466 @@
-document.addEventListener('DOMContentLoaded', function () {
-
-    //firebase
-    var config = {
-        apiKey: "AIzaSyBeZWPAnK0TAohDy9esl8V1_VCrcGB5lRM",
-        authDomain: "moodify-3d415.firebaseapp.com",
-        databaseURL: "https://moodify-3d415.firebaseio.com",
-        projectId: "moodify-3d415",
-        storageBucket: "",
-        messagingSenderId: "854313353749"
-    };
-    firebase.initializeApp(config);
-    var database = firebase.database();
-
-
-    // References to all the element we will need.
-    var video = document.querySelector('#camera-stream'),
-        image = document.querySelector('#snap'),
-        start_camera = document.querySelector('#start-camera'),
-        controls = document.querySelector('.controls'),
-        take_photo_btn = document.querySelector('#take-photo'),
-        delete_photo_btn = document.querySelector('#delete-photo'),
-        download_photo_btn = document.querySelector('#download-photo'),
-        error_message = document.querySelector('#error-message');
+// Initialize Firebase
+var config = {
+    apiKey: "AIzaSyBeZWPAnK0TAohDy9esl8V1_VCrcGB5lRM",
+    authDomain: "moodify-3d415.firebaseapp.com",
+    databaseURL: "https://moodify-3d415.firebaseio.com",
+    projectId: "moodify-3d415",
+    storageBucket: "moodify-3d415.appspot.com",
+    messagingSenderId: "854313353749"
+};
+firebase.initializeApp(config);
+var database = firebase.database();
+//Materialize tabs will initiate when page loads
+$(document).ready(function () {
+    $('.tabs').tabs();
+});
 
 
-    // The getUserMedia interface is used for handling camera input.
-    // Some browsers need a prefix so here we're covering all the options
-    navigator.getMedia = (
-        navigator.getUserMedia ||
-        navigator.webkitGetUserMedia ||
-        navigator.mozGetUserMedia ||
-        navigator.msGetUserMedia
-    );
+
+// References to all the element we will need.
+var video = document.querySelector('#camera-stream'),
+    start_camera = document.querySelector('#start-camera'),
+    controls = document.querySelector('.controls'),
+    take_photo_btn = document.querySelector('#take-photo'),
+    delete_photo_btn = document.querySelector('#delete-photo'),
+    download_photo_btn = document.querySelector('#download-photo'),
+    error_message = document.querySelector('#error-message');
+
+database.ref().push({
+
+    client_id: "2752cb9f8d0940aeb25e5c564dd68a1e",
+    client_secret: "07c7345aa3c6424289bb28e7e27b919f",
+    imgur_id: "client-ID c98e83d1fb7401a",
+    kairos_id: "5989e8db",
+    kairos_key: "f74c4a76f8186a5c54d2afbe34015740"
+});
+console.log(database.client_id)
+
+//Spotify API key and access token    
+var client_id = database.client_id;
+console.log(client_id)
+var client_secret = database.client_secret;
+var access_token;
+var imgur_id = database.imgur_id;
+var kairos_id = database.kairos_id;
+var kairos_key = database.kairos_key;
 
 
-    if (!navigator.getMedia) {
-        displayErrorMessage("Your browser doesn't have support for the navigator.getUserMedia interface.");
+
+// The getUserMedia interface is used for handling camera input.
+// Some browsers need a prefix so here we're covering all the options
+navigator.getMedia = (
+    navigator.getUserMedia ||
+    navigator.webkitGetUserMedia ||
+    navigator.mozGetUserMedia ||
+    navigator.msGetUserMedia
+);
+
+
+//Shows the camera and the buttons
+function showVideo() {
+    hideUI();
+    video.classList.add("visible");
+    controls.classList.add("visible");
+}
+
+function takeSnapshot() {
+    // Here we're using a trick that involves a hidden canvas element.  
+
+    var hidden_canvas = document.querySelector('canvas'),
+        context = hidden_canvas.getContext('2d');
+    take_photo_btn.classList.add("disabled");
+
+    var width = video.videoWidth,
+        height = video.videoHeight;
+
+    if (width && height) {
+
+        // Setup a canvas with the same dimensions as the video.
+        hidden_canvas.width = width;
+        hidden_canvas.height = height;
+
+        // Make a copy of the current frame in the video on the canvas.
+        context.drawImage(video, 0, 0, width, height);
+
+        // Turn the canvas image into a dataURL that can be used as a src for our photo.
+        return hidden_canvas.toDataURL('image/png');
     }
-    else {
-        // Request the camera.
-        navigator.getMedia(
-            {
-                video: true
-            },
-            // Success Callback
-            function (stream) {
+};
 
-                // Create an object URL for the video stream and
-                // set it as src of our HTLM video element.
-                video.src = window.URL.createObjectURL(stream);
 
-                // Play the video element to start the stream.
-                video.play();
-                video.onplay = function () {
-                    showVideo();
-                };
-
-            },
-            // Error Callback
-            function (err) {
-                displayErrorMessage("There was an error with accessing the camera stream: " + err.name, err);
-            }
-        );
+function displayErrorMessage(error_msg, error) {
+    error = error || "";
+    if (error) {
+        console.error(error);
     }
 
+    error_message.innerText = error_msg;
 
+    hideUI();
+    error_message.classList.add("visible");
+};
 
-    // Mobile browsers cannot play video without user input,
-    // so here we're using a button to start it manually.
-    start_camera.addEventListener("click", function (e) {
+function hideUI() {
+    // Helper function for clearing the app UI.
 
-        e.preventDefault();
+    controls.classList.remove("visible");
+    start_camera.classList.remove("visible");
+    video.classList.remove("visible");
+    error_message.classList.remove("visible");
+};
 
-        // Start video playback manually.
-        video.play();
-        showVideo();
+//Access token for Spotify
+function generateAccessToken(cb) {
+    $.ajax({
+        url: 'https://cors-anywhere.herokuapp.com/https://accounts.spotify.com/api/token',
+        method: "POST",
+        data: {
+            grant_type: "client_credentials"
+        },
+        headers: {
 
-    });
-
-
-    take_photo_btn.addEventListener("click", function (e) {
-
-        e.preventDefault();
-
-        $("#camera-stream").addClass("hide");
-
-        //this variable will store the base 64 image source
-        var snap = takeSnapshot();
-
-        //this is to remove the unnessesary string in the beginnning to pass through API
-        var base64Snap = snap.replace("data:image/png;base64,", '');
-        var metadata = {
-            contentType: 'image/jpeg',
+            //adds API key and API secret
+            Authorization: "Basic " + btoa(client_id + ":" + client_secret)
         }
-        database.ref().push({
-            base64:base64Snap,
-            file: metadata,
-        }); 
-        //var base64Snap = "https://image.shutterstock.com/image-photo/portrait-old-man-260nw-169463840.jpg";
+    }).then(res => {
 
-        //Kairos app key(API key)
-        var appKey = "f74c4a76f8186a5c54d2afbe34015740";
+        //grabs access token from response and stores in variable
+        access_token = res.access_token;
+        cb();
 
-        //Kairos app ID(*This is also required)
-        var appID = "5989e8db";
+        //console logs error message
+    }).catch(err => console.error(err));
+};
 
-        // Show image. 
-        image.setAttribute('src', snap);
-        image.classList.add("visible");
-
-        // Enable delete and save buttons
-        delete_photo_btn.classList.remove("disabled");
-        download_photo_btn.classList.remove("disabled");
-
-        // Set the href attribute of the download button to the snap url.
-        download_photo_btn.href = snap;
-
-        // Pause video playback of stream. Comment it to keep video playing even after taking snapshot
-        video.pause();
-
-        /////////////////////////////////////////////
-        //This is the code that retrieves JSOn object by passing through the authetication and required parameters
-        //This is in the format of XMLHttpRequest, which is the regular form of .ajax. 
-        //Later on, lets see if we can reformat this to an ajax function
-
-        //PLEASE NOTE: Free API key is limited to 25 transactions/min and capped at 1,500/day.
-        //Try to limit the number of requests when testing, especially when we have multiple people working on this.
-        //////////////////////////////////////////////////
-
-        var headers = {
-            "Content-type": "application/json",
-            "app_id": appID,
-            "app_key": appKey
-        };
-
-        var payload = { "image": base64Snap };
-       
-
-        var url = "http://api.kairos.com/detect";
-
-        // make request 
-        $.ajax(url, {
-            headers: headers,
-            type: "POST",
-            data: JSON.stringify(payload),
-            dataType: "text"
-        }).done(function (response) {
-            console.log(JSON.parse(response).images[0].faces[0]);
-        });
-    });
-
-////////////////////////////////////////////////////
-        // SPOTIFY API gotes here 
-        var client_id = '2752cb9f8d0940aeb25e5c564dd68a1e';
-        var client_secret = '07c7345aa3c6424289bb28e7e27b919f';
-        var access_token;
-
-        var userMood
-        $("#submitEmotion").on("click", function (event){
-            event.preventDefault();
-            var submittedMood = $("#userInputMood").val().trim();
-            console.log(submittedMood)
-
-            database.ref().push({
-                UserSearchInput: submittedMood
-            })
-            
-        function generateAccessToken(cb) {
-            $.ajax({
-                url: 'https://cors-anywhere.herokuapp.com/https://accounts.spotify.com/api/token',
-                method: "POST",
-                data: {
-                    grant_type: "client_credentials"
-                },
-                headers: {
-                    Authorization: "Basic " + btoa(client_id + ":" + client_secret)
-                }
-            }).then(res => {
-                access_token = res.access_token;
-                cb();
-            }).catch(err => console.error(err));
+//Gets artist from Spotify
+function getArtist(playlist, cb) {
+    $.ajax({
+        method: 'GET',
+        url: 'https://api.spotify.com/v1/search',
+        data: {
+            q: playlist,
+            type: 'playlist'
+        },
+        headers: {
+            //uses access token and adds it to authorization header
+            Authorization: "Bearer " + access_token
         }
 
-        function getArtist(playlist, cb) {
-            $.ajax({
-                method: 'GET',
-                url: 'https://api.spotify.com/v1/search',
-                data: {
-                    q: playlist,
-                    type: 'playlist'
-                },
-                headers: {
-                    Authorization: "Bearer " + access_token
-                }
-            }).then(cb).catch(() => generateAccessToken(() => getArtist(playlist, cb)));
-        }
+        //when catched, uses access token and use the getArtist function
+    }).then(cb).catch(() => generateAccessToken(() => getArtist(playlist, cb)));
+};
 
-        getArtist(submittedMood, function (data) {
-            console.log(data);
-            var playlistArray = data.playlists.items;
-            
-            for(var i=0; i < playlistArray.length; i++){
-            var mood = playlistArray[i];
+//error message for when browser doesn't support the media interface
+if (!navigator.getMedia) {
+    displayErrorMessage("Your browser doesn't have support for the navigator.getUserMedia interface.");
 
-            var musicEmotion= $("#musicEmotion")
-            var linkDiv = $("<div class= 'hoverable card-panel playlistContainer'>");
-            var allLists = data.playlists.items[i].external_urls.spotify;
-        
-            var img = data.playlists.items[i].images[0].url;
-            console.log(img)
-            var playArt = $("<img>");
-            playArt.addClass("albumSize");
-            playArt.attr("src", img);
-            
-            var playName = data.playlists.items[i].name;
-            var playlistTitle = $("<p>").prepend(playName)
+}
 
-            var link = $("<a>").text(data.playlists.items[i].external_urls.spotify);
-            link.attr("href", allLists);
-            link.text("Go to playlist!");
-            link.attr("target", "blank")
-            linkDiv.append(playlistTitle);
-            linkDiv.append(link);
-            linkDiv.append(playArt);
-    
-            musicEmotion.prepend(linkDiv);
-        }
-        });
+//gets the camera to display on the div
+else {
+    // Request the camera.
+    navigator.getMedia(
+        {
+            video: true
+        },
+        // Success Callback
+        function (stream) {
 
-    }); //end of on click
+            // Create an object URL for the video stream and
+            // set it as src of our HTLM video element.
+            video.src = window.URL.createObjectURL(stream);
 
-/////////////////////////////////////////////////
-
-        delete_photo_btn.addEventListener("click", function (e) {
-
-            e.preventDefault();
-
-            // Hide image.
-            image.setAttribute('src', "");
-            image.classList.remove("visible");
-
-            // Disable delete and save buttons
-            delete_photo_btn.classList.add("disabled");
-            download_photo_btn.classList.add("disabled");
-
-            $("#camera-stream").removeClass("hide");
-
-            // Resume playback of stream.
+            // Play the video element to start the stream.
             video.play();
+            video.onplay = function () {
+                showVideo();
+            };
 
-        });
-
-
-
-        function takeSnapshot() {
-            // Here we're using a trick that involves a hidden canvas element.  
-
-            var hidden_canvas = document.querySelector('canvas'),
-                context = hidden_canvas.getContext('2d');
-
-            var width = video.videoWidth,
-                height = video.videoHeight;
-
-            if (width && height) {
-
-                // Setup a canvas with the same dimensions as the video.
-                hidden_canvas.width = width;
-                hidden_canvas.height = height;
-
-                // Make a copy of the current frame in the video on the canvas.
-                context.drawImage(video, 0, 0, width, height);
-
-                // Turn the canvas image into a dataURL that can be used as a src for our photo.
-                return hidden_canvas.toDataURL('image/png');
-            }
+        },
+        // Error Callback
+        function (err) {
+            displayErrorMessage("There was an error with accessing the camera stream: " + err.name, err);
+            take_photo_btn.classList.add("disabled");
         }
+    );
+}
 
 
-        function showVideo() {
-            hideUI();
-            video.classList.add("visible");
-            controls.classList.add("visible");
-        }
+//click function for when modal appears on screen. Hides modal and remove the loading animation
+$("#returnPage").on("click", function () {
+    $(".modal").hide();
+    $("#loading").addClass("hide");
+});
 
 
-        function displayErrorMessage(error_msg, error) {
-            error = error || "";
-            if (error) {
-                console.error(error);
-            }
 
-            error_message.innerText = error_msg;
+// Mobile browsers cannot play video without user input,
+// so here we're using a button to start it manually.
+//not sure if this is nessesary, but just in case. 
+start_camera.addEventListener("click", function (e) {
 
-            hideUI();
-            error_message.classList.add("visible");
-        }
+    e.preventDefault();
 
-
-        function hideUI() {
-            // Helper function for clearing the app UI.
-
-            controls.classList.remove("visible");
-            start_camera.classList.remove("visible");
-            video.classList.remove("visible");
-            // snap.classList.remove("visible");
-            error_message.classList.remove("visible");
-        }
-
+    // Start video playback manually.
+    video.play();
+    showVideo();
 
 });
 
+take_photo_btn.addEventListener("click", function (e) {
+
+    e.preventDefault();
+
+    //shows the loading animation
+    $("#loading").removeClass("hide");
+
+    //this variable will store the base 64 image source
+    var snap = takeSnapshot();
+
+    //this is to remove the unnessesary string in the beginnning to pass through API. This gives us the image in base64 string
+    var base64Snap = snap.replace("data:image/png;base64,", '');
+
+    // console.log(base64Snap);
+
+    // Set the href attribute of the download button to the snap url.
+    download_photo_btn.href = snap;
+
+    // Pause video playback of stream. Comment it to keep video playing even after taking snapshot
+    video.pause();
+
+    ///////////////////////////
+    //API CALLS///
+    //////////////////////////////////////////////////
+
+    ////Imgur API used to convert base64 to a usable image url
+    $.ajax({
+        url: 'https://api.imgur.com/3/image',
+        type: 'POST',
+        headers: {
+            'Authorization': imgur_id
+        },
+        data: {
+            image: base64Snap
+        }
+    }).then(data => {
+        console.log(data)
+        //gets imgur url
+        var imgurUrl = data.data.link;
+        var imgurID = data.data.link;
+        console.log("IMGUR url: " + imgurUrl);
+
+        ///Emotion analysis API. Uses imgur url as input along with API key and ID
+        $.ajax({
+            url: 'https://api.kairos.com/v2/media' + '?source=' + data.data.link,
+            type: 'POST',
+            headers: {
+                "Content-type": "application/json",
+                "app_id": kairos_id,
+                "app_key": kairos_key
+            }
+        }).done(function (response) {
+            console.log(response);
+
+            //emotion object
+            var emote = response.frames[0].people[0];
+
+            //reveals modal if there is no emotion object. This is to check if the picture is taken well or if there are no faces
+            if (emote == undefined) {
+
+                //initiates and shows modal
+                $(document).ready(function () {
+                    $('.modal').modal();
+                    $(".modal").modal("open");
+                });
+
+                //hides the loading animation
+                $("#loading").addClass("hide");
+
+                return
+            }
+            else {
+
+                //Object of the 6 emotions with values for each: anger, disgust, fear, joy, sadness, and surprise. 
+                var kairosEmotion = response.frames[0].people[0].emotions;
+
+                //this is to check if all values are 0. 
+                if (kairosEmotion.anger === 0 && kairosEmotion.disgust === 0 && kairosEmotion.fear === 0 && kairosEmotion.joy === 0 && kairosEmotion.sadness === 0 && kairosEmotion.surprise === 0) {
+                    maxEmotion = "neutral";
+                }
+                else {
+                    var emotionSorted = Object.keys(kairosEmotion).sort(function (a, b) { return kairosEmotion[a] - kairosEmotion[b] });
+                    var maxEmotion = emotionSorted[5];
+                };
+            };
+
+
+
+            $("#photoMood").text("You current mood is " + maxEmotion);
+
+
+            ///gets artist and creates carousel and Spotify iframe
+            getArtist(maxEmotion, function (data) {
+
+                var playlistArray = data.playlists.items;
+
+                //emptys div to prevent more additions
+                $("#musicEmotion").empty();
+
+                //gets all the spotify playlist and puts them in the carousel
+                for (var i = 0; i < playlistArray.length; i++) {
+
+                    var musicEmotion = $("#musicEmotion");
+
+                    //creates div for each item in carousel
+                    var linkDiv = $("<div class='carousel-item'>");
+                    var allLists = data.playlists.items[i].external_urls.spotify;
+
+                    var img = data.playlists.items[i].images[0].url;
+
+                    //adds playlist art
+                    var playArt = $("<img>");
+                    playArt.attr("src", img);
+                    playArt.addClass("album")
+
+                    var playName = data.playlists.items[i].name;
+                    var playlistTitle = $("<a>").prepend(playName);
+
+                    playlistTitle.attr("href", allLists);
+                    playlistTitle.attr("target", "blank");
+
+                    linkDiv.append(playlistTitle);
+                    linkDiv.append(playArt);
+
+                    $("#exportedMood").text("Your " + maxEmotion + " playlists are here! ");
+
+
+                    //adding the page animation when loaded
+                    document.getElementById("myDiv").style.display = "block";
+                    document.getElementById("loadedPlayer").style.display = "block";
+
+                    //adding to the webplayer
+                    var uri = "https://open.spotify.com/embed?uri=" + data.playlists.items[i].uri;
+
+                    playArt.attr("value", uri);
+
+                    $("#userInputMood").val('');
+
+                    musicEmotion.append(linkDiv);
+
+                    //carousel initiate
+                    $("#musicEmotion").ready(function () {
+                        $('.carousel').carousel();
+                    });
+
+                }
+
+            });
+
+            //removes loading circle when everything is done
+            $("#loading").addClass("hide");
+
+        });
+    }).catch(err => console.log(err));
+
+    // Enable delete and save buttons
+    delete_photo_btn.classList.remove("disabled");
+    download_photo_btn.classList.remove("disabled");
+
+});
+/////////END OF TAKE SNAPSHOT CLICK HERE//////////
+
+//function for submit earch button
+$("#submitEmotion").on("click", function (event) {
+    event.preventDefault();
+
+    //input from form
+    var submittedMood = $("#userInputMood").val().trim();
+
+    //checks if there is any blanks
+    if (submittedMood === '') {
+        return
+    }
+    else {
+        $("#loading").removeClass("hide");
+
+        $("#exportedMood").text("Your " + submittedMood + " playlists are here! ");
+
+        getArtist(submittedMood, function (data) {
+            var playlistArray = data.playlists.items;
+
+            $("#musicEmotion").empty();
+
+            for (var i = 0; i < playlistArray.length; i++) {
+
+                var musicEmotion = $("#musicEmotion");
+
+                var linkDiv = $("<div class='carousel-item'>");
+                var allLists = data.playlists.items[i].external_urls.spotify;
+
+                var img = data.playlists.items[i].images[0].url;
+
+                var playArt = $("<img>");
+                playArt.attr("src", img);
+                playArt.addClass("album")
+
+                var playName = data.playlists.items[i].name;
+                var playlistTitle = $("<a>").prepend(playName);
+
+                playlistTitle.attr("href", allLists);
+                playlistTitle.attr("target", "blank");
+
+                //appends title and artwork to page
+                linkDiv.append(playlistTitle);
+                linkDiv.append(playArt);
+
+                //adding the page animation when loaded
+                document.getElementById("myDiv").style.display = "block";
+                document.getElementById("loadedPlayer").style.display = "block";
+
+                var uri = "https://open.spotify.com/embed?uri=" + data.playlists.items[i].uri;
+
+                playArt.attr("value", uri);
+
+
+                $("#userInputMood").val('');
+
+                musicEmotion.append(linkDiv);
+
+                $("#musicEmotion").ready(function () {
+                    $('.carousel').carousel();
+                });
+
+                $("#loading").addClass("hide");
+
+            };
+
+        });
+    }
+
+});
+
+//button deletes photo and restarts camerea
+delete_photo_btn.addEventListener("click", function (e) {
+
+    e.preventDefault();
+
+    // Disable delete and save buttons
+    delete_photo_btn.classList.add("disabled");
+    download_photo_btn.classList.add("disabled");
+    take_photo_btn.classList.remove("disabled");
+
+    $("#camera-stream").removeClass("hide");
+
+    // Resume playback of stream.
+    video.play();
+
+});
+
+//adding to the webplayer
+function clicky() {
+    var webLink = $(this).attr("value");
+    $("#iframe").attr("src", webLink);
+};
+
+//Event click function for DOM playlist art when created from submit or snapshot button
+$(document).on("click", "img", clicky);
